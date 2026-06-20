@@ -102,9 +102,9 @@ func _build_visual() -> void:
 	cs.position.y = sz.y * 0.5
 	add_child(cs)
 
-	# 적=레이어4, 지형/건물(레이어1)과만 충돌
+	# 적=레이어4, 지형(1)+건물(16)과 충돌(벽이 막아줌)
 	collision_layer = 4
-	collision_mask = 1
+	collision_mask = 1 | 16
 
 
 func _physics_process(delta: float) -> void:

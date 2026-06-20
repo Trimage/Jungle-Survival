@@ -255,6 +255,10 @@ func _process(delta: float) -> void:
 	_update_boss_bar()
 	_update_raid_warning()
 	_tick_autosave(delta)
+	# 행동 버튼 미리보기: 지금 [행동]을 누르면 무엇을 할지 표시
+	if is_instance_valid(_player) and _player.has_method("peek_action"):
+		var hint: String = _player.peek_action()
+		_action_button.text = ("행동\n%s" % hint) if hint != "" else "행동"
 	# 부락민 수 + 현재 목표 표시
 	var day: int = _daynight.day if _daynight else 1
 	var boss_alive: bool = get_tree().get_first_node_in_group("boss") != null

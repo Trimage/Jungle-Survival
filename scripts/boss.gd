@@ -77,7 +77,7 @@ func _ready() -> void:
 	_damage *= scale
 	_build_visual()
 	collision_layer = 4
-	collision_mask = 1
+	collision_mask = 1 | 16  # 지형 + 건물
 	_player = get_tree().get_first_node_in_group("player")
 	_summon_cd = summon_interval
 

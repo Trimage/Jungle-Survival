@@ -43,6 +43,7 @@ var _pivot: Node3D
 var _mat: StandardMaterial3D
 var _anim: AnimationPlayer = null
 var _walk_anim: String = ""
+var _job_label: Label3D = null
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 var _hp: float = 40.0
 var _max_hp: float = 40.0
@@ -66,7 +67,33 @@ func _ready() -> void:
 		_become_recruited()
 	else:
 		add_to_group("recruitable")
+	_add_job_label()
 	_pick_wander_target()
+
+
+## 머리 위 직업 표시(영입 전후 모두) — 어떤 직업인지 보고 영입 선택
+func _add_job_label() -> void:
+	_job_label = Label3D.new()
+	_job_label.text = "%s %s" % [_job_icon(), _def.get("name", job)]
+	_job_label.font_size = 40
+	_job_label.pixel_size = 0.0075
+	_job_label.position.y = 2.05
+	_job_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	_job_label.no_depth_test = true
+	_job_label.outline_size = 6
+	_job_label.modulate = Color(1, 1, 1) if recruited else Color(0.75, 1.0, 0.8)
+	add_child(_job_label)
+
+
+func _job_icon() -> String:
+	match job:
+		"gatherer": return "🪓"
+		"hunter": return "🏹"
+		"mechanic": return "🔧"
+		"herbalist": return "🌿"
+		"cook": return "🍳"
+		"miner": return "⛏"
+	return "•"
 
 
 func _load_job_stats() -> void:

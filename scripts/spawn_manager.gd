@@ -107,6 +107,7 @@ func _try_repopulate() -> void:
 			huts.append(b)
 	var v: Node3D = villager_scene.instantiate()
 	v.recruited = false
+	v.job = _random_job()
 	_get_world().add_child(v)
 	if huts.size() > 0:
 		var h: Node3D = huts[randi() % huts.size()]
@@ -205,10 +206,19 @@ func _spawn_villagers(count: int) -> void:
 	for i in count:
 		var v: Node3D = villager_scene.instantiate()
 		v.recruited = false
+		v.job = _random_job()
 		_get_world().add_child(v)
 		var ang := randf() * TAU
 		var r := randf_range(6.0, 14.0)
 		v.global_position = Vector3(cos(ang) * r, 1.0, sin(ang) * r)
+
+
+## 떠돌이 부락민의 무작위 직업(데이터의 직업 중 하나)
+func _random_job() -> String:
+	var jobs: Array = ItemDB.villagers.keys()
+	if jobs.is_empty():
+		return "gatherer"
+	return jobs[randi() % jobs.size()]
 
 
 func _get_world() -> Node:

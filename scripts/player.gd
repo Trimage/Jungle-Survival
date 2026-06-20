@@ -85,6 +85,7 @@ func _ready() -> void:
 	_joystick = get_tree().get_first_node_in_group("joystick")
 	_spawn_pos = global_position
 	_stats.died.connect(_on_stats_died)
+	collision_mask = 1 | 16  # 지형(1) + 건물(16) 과 충돌 (벽은 막힘)
 	# 카툰 외곽선: 몸통/코 머티리얼에 외곽선 패스 추가
 	for part in ["Body", "Nose"]:
 		var mi: MeshInstance3D = _mesh_pivot.get_node_or_null(part)
@@ -192,8 +193,6 @@ func action() -> void:
 		return
 	if _try_recruit():
 		return
-	if _try_assign_job():
-		return
 	if _try_open_chest():
 		return
 	if _try_toggle_gate():
@@ -205,6 +204,49 @@ func action() -> void:
 	if _try_tame():
 		return
 	attack()
+
+
+## 행동 버튼이 지금 수행할 행동 미리보기 라벨(우선순위는 action()과 동일)
+func peek_action() -> String:
+	if _dead:
+		return ""
+	var rec := _nearest_recruitable()
+	if rec:
+		return "영입: " + ItemDB.villager_def(rec.job).get("name", "부락민")
+	if _nearest_in_group("chest", 2.8):
+		return "상자 열기"
+	for b in get_tree().get_nodes_in_group("building"):
+		if b.has_method("is_gate") and b.is_gate() and global_position.distance_to(b.global_position) < 2.8:
+			return "성문 여닫기"
+	if _nearest_in_group("merchant", 3.2):
+		return "거래"
+	for area in _interact_area.get_overlapping_areas():
+		if area.is_in_group("resource_node") and area.has_method("is_available") and area.is_available():
+			return "채집"
+	if get_tree().get_nodes_in_group("pet").size() < MAX_PETS:
+		for e in get_tree().get_nodes_in_group("enemy"):
+			if e.has_method("is_tameable") and e.is_tameable() and global_position.distance_to(e.global_position) < 2.8:
+				return "길들이기"
+	return "공격"
+
+
+func _nearest_recruitable() -> Node:
+	var best: Node = null
+	var bd: float = INF
+	for body in _interact_area.get_overlapping_bodies():
+		if body.is_in_group("recruitable"):
+			var d: float = global_position.distance_to(body.global_position)
+			if d < bd:
+				bd = d
+				best = body
+	return best
+
+
+func _nearest_in_group(g: String, dist: float) -> Node:
+	for n in get_tree().get_nodes_in_group(g):
+		if global_position.distance_to(n.global_position) < dist:
+			return n
+	return null
 
 
 ## 근처 떠돌이 상인과 대화(거래 패널 열기). 성공 시 true.
