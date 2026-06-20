@@ -9,15 +9,17 @@ func _ready() -> void:
 	_patch(Vector3(9, 0, 9), 5.5, Color(0.5, 0.42, 0.3))
 	_patch(Vector3(-7, 0, 7), 4.5, Color(0.46, 0.4, 0.3))
 	_patch(Vector3(0, 0, 0), 6.0, Color(0.55, 0.5, 0.4))  # 중앙 광장
-	# 낮은 언덕(외곽)
-	_hill(Vector3(18, 0, -16), 7.0, 1.4)
-	_hill(Vector3(-20, 0, 14), 8.0, 1.8)
-	_hill(Vector3(16, 0, 18), 6.0, 1.2)
-	_hill(Vector3(-18, 0, -18), 6.5, 1.5)
+	# 걸어 오를 수 있는 고지대(외곽) — 완만한 경사면을 걸어 정상에 오름
+	_walkable_hill(Vector3(18, 0, -16), 7.5, 3.2, 2.0)
+	_walkable_hill(Vector3(-20, 0, 14), 8.5, 3.6, 2.8)
+	_walkable_hill(Vector3(16, 0, 18), 6.5, 2.8, 1.6)
+	_walkable_hill(Vector3(-18, 0, -18), 7.0, 3.0, 2.4)
 	# 고대 폐허 군집(엄폐물)
 	_ruins(Vector3(8, 0, -4))
 	# 맵 경계: 바닥(±30) 끝에서 떨어지지 않도록 보이지 않는 벽
 	_boundary(29.0)
+	# 장식 산포(나무·바위)로 맵 디자인
+	_decorate()
 
 
 func _mat(c: Color) -> StandardMaterial3D:
@@ -54,15 +56,80 @@ func _patch(pos: Vector3, r: float, col: Color) -> void:
 	add_child(mi)
 
 
-func _hill(pos: Vector3, base_r: float, h: float) -> void:
+## 외곽선 머티리얼
+func _outlined(c: Color) -> StandardMaterial3D:
+	var m := _mat(c)
+	LowpolyFactory.apply_outline(m)
+	return m
+
+
+## 걸어 오를 수 있는 고지대(원뿔대) — 옆면이 완만해 걸어서 정상에 도달, 윗면은 평평
+func _walkable_hill(center: Vector3, base_r: float, top_r: float, height: float) -> void:
+	var body := StaticBody3D.new()
+	body.collision_layer = 1   # 지형과 동일 → 플레이어/맹수가 위를 걸음
+	body.collision_mask = 0
+	add_child(body)
+	body.position = center
+
 	var mi := MeshInstance3D.new()
 	var cyl := CylinderMesh.new()
 	cyl.bottom_radius = base_r
-	cyl.top_radius = base_r * 0.45
-	cyl.height = h
+	cyl.top_radius = top_r
+	cyl.height = height
+	cyl.radial_segments = 14
 	mi.mesh = cyl
-	mi.position = pos + Vector3(0, h * 0.5, 0)
-	mi.material_override = _mat(Color(0.36, 0.55, 0.3).lightened(randf() * 0.08))
+	mi.position.y = height * 0.5
+	mi.material_override = _outlined(Color(0.5, 0.42, 0.3))  # 흙 옆면
+	body.add_child(mi)
+
+	# 충돌: 원뿔대 볼록 형상 → 경사면을 걸어 오를 수 있음
+	var cs := CollisionShape3D.new()
+	cs.shape = cyl.create_convex_shape()
+	cs.position.y = height * 0.5
+	body.add_child(cs)
+
+	# 윗면 잔디 캡(시각)
+	var cap := MeshInstance3D.new()
+	var cm := CylinderMesh.new()
+	cm.bottom_radius = top_r * 1.04
+	cm.top_radius = top_r * 1.04
+	cm.height = 0.14
+	cap.mesh = cm
+	cap.position.y = height + 0.05
+	cap.material_override = _outlined(Color(0.4, 0.6, 0.34))  # 잔디 윗면
+	body.add_child(cap)
+
+
+## 맵 장식 산포: 나무 + 바위(외곽, 비충돌)
+func _decorate() -> void:
+	for _i in 16:
+		var a := randf() * TAU
+		var r := randf_range(11.0, 26.0)
+		_deco_tree(Vector3(cos(a) * r, 0.0, sin(a) * r))
+	for _j in 18:
+		var a2 := randf() * TAU
+		var r2 := randf_range(9.0, 27.0)
+		_deco_rock(Vector3(cos(a2) * r2, 0.0, sin(a2) * r2), randf_range(0.45, 1.0))
+
+
+func _deco_tree(pos: Vector3) -> void:
+	var sz := Vector3(randf_range(1.6, 2.4), randf_range(2.6, 3.6), randf_range(1.6, 2.4))
+	var vis: Node3D = LowpolyFactory.build(sz, Color(0.3, 0.55, 0.3), "", false, "tree")
+	add_child(vis)
+	vis.position = pos
+	vis.rotation.y = randf() * TAU
+
+
+func _deco_rock(pos: Vector3, s: float) -> void:
+	var mi := MeshInstance3D.new()
+	var sm := SphereMesh.new()
+	sm.radius = s
+	sm.height = s * 1.4
+	mi.mesh = sm
+	mi.position = pos + Vector3(0.0, s * 0.3, 0.0)
+	mi.scale = Vector3(1.0, randf_range(0.55, 0.85), 1.0)
+	mi.rotation.y = randf() * TAU
+	mi.material_override = _outlined(Color(0.5, 0.5, 0.53).darkened(randf() * 0.12))
 	add_child(mi)
 
 
