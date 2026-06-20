@@ -41,6 +41,8 @@ var _wander_timer: float = 0.0
 
 var _pivot: Node3D
 var _mat: StandardMaterial3D
+var _anim: AnimationPlayer = null
+var _walk_anim: String = ""
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 var _hp: float = 40.0
 var _max_hp: float = 40.0
@@ -92,6 +94,8 @@ func _build_visual() -> void:
 		vis.rotation.y = PI  # KayKit 등은 -Z 정면 → 게임 정면(+Z)에 맞춤
 		_pivot.add_child(vis)
 		_mat = null
+		_anim = LowpolyFactory.find_anim_player(vis)
+		_walk_anim = LowpolyFactory.pick_locomotion(_anim)
 	else:
 		var body := MeshInstance3D.new()
 		var cap := CapsuleMesh.new()
@@ -273,6 +277,7 @@ func _physics_process(delta: float) -> void:
 	if move_dir.length() > 0.05:
 		var target_yaw := atan2(move_dir.x, move_dir.z)
 		_pivot.rotation.y = lerp_angle(_pivot.rotation.y, target_yaw, 0.25)
+	LowpolyFactory.update_locomotion(_anim, _walk_anim, Vector2(velocity.x, velocity.z).length())
 
 
 func _do_wander(delta: float) -> Vector3:

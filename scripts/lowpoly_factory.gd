@@ -239,6 +239,47 @@ static func _find_anim_player(n: Node) -> AnimationPlayer:
 	return null
 
 
+## (공개) 모델 트리에서 AnimationPlayer 찾기
+static func find_anim_player(root: Node) -> AnimationPlayer:
+	return _find_anim_player(root)
+
+
+## 이동(걷기/달리기) 애니메이션 이름 추정. 없으면 "".
+static func pick_locomotion(ap: AnimationPlayer) -> String:
+	if ap == null:
+		return ""
+	var names := ap.get_animation_list()
+	for key in ["walking_a", "walk", "running_a", "run", "jog", "move"]:
+		for n in names:
+			if key in String(n).to_lower():
+				return n
+	return ""
+
+
+## 애니메이션을 루프 재생(이미 그 애니면 무시, 없는 애니면 무시)
+static func play_loop(ap: AnimationPlayer, name: String) -> void:
+	if ap == null or name == "" or not ap.has_animation(name):
+		return
+	if ap.current_animation == name:
+		return
+	var a := ap.get_animation(name)
+	if a:
+		a.loop_mode = Animation.LOOP_LINEAR
+	ap.play(name)
+
+
+## 이동 속도에 따라 걷기/Idle 전환 + 걷기 애니 속도를 이동속도에 맞춤(슬라이딩 완화)
+static func update_locomotion(ap: AnimationPlayer, walk_anim: String, planar_speed: float) -> void:
+	if ap == null:
+		return
+	if planar_speed > 0.6 and walk_anim != "":
+		play_loop(ap, walk_anim)
+		ap.speed_scale = clampf(planar_speed / 3.0, 0.8, 2.4)
+	else:
+		play_loop(ap, "Idle")
+		ap.speed_scale = 1.0
+
+
 ## 발밑 블롭 그림자(둥근 반투명 디스크) — 토이 같은 하이퍼캐주얼 접지감
 static func make_blob_shadow(radius: float) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()

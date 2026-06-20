@@ -77,6 +77,8 @@ var _shield_t: float = 0.0           # >0 동안 피해 무효(철갑 물약)
 
 
 var _walk_t: float = 0.0
+var _anim: AnimationPlayer = null
+var _walk_anim: String = ""
 
 
 func _ready() -> void:
@@ -105,6 +107,8 @@ func _apply_character_model() -> void:
 	var vis: Node3D = LowpolyFactory.build(Vector3(0.8, 1.7, 0.8), Color.WHITE, PLAYER_MODEL, false)
 	vis.rotation.y = PI  # -Z 정면 모델을 게임 정면(+Z)에 맞춤
 	_mesh_pivot.add_child(vis)
+	_anim = LowpolyFactory.find_anim_player(vis)
+	_walk_anim = LowpolyFactory.pick_locomotion(_anim)
 
 
 func _physics_process(delta: float) -> void:
@@ -169,10 +173,14 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-	# 이동 방향으로 메시 회전 + 둥실 걷기 바운스
+	# 이동 방향으로 메시 회전
 	if dir.length() > 0.01:
 		var target_yaw := atan2(dir.x, dir.z)
 		_mesh_pivot.rotation.y = lerp_angle(_mesh_pivot.rotation.y, target_yaw, turn_speed * delta)
+	# 이동 모션: 모델 애니(있으면 걷기/달리기) 또는 캡슐 폴백 바운스
+	if _anim != null:
+		LowpolyFactory.update_locomotion(_anim, _walk_anim, Vector2(velocity.x, velocity.z).length())
+	elif dir.length() > 0.01:
 		_walk_t += delta * 12.0
 		_mesh_pivot.position.y = absf(sin(_walk_t)) * 0.08
 	else:

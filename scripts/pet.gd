@@ -18,6 +18,8 @@ var _player: Node3D = null
 var _mesh: Node3D
 var _mat: StandardMaterial3D
 var _base_color: Color = Color.WHITE
+var _anim: AnimationPlayer = null
+var _walk_anim: String = ""
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 
 
@@ -59,6 +61,8 @@ func _build_visual() -> void:
 		_mesh = built
 	add_child(_mesh)
 	add_child(LowpolyFactory.make_blob_shadow(maxf(sz.x, sz.z) * 0.55))  # 발밑 그림자
+	_anim = LowpolyFactory.find_anim_player(built)
+	_walk_anim = LowpolyFactory.pick_locomotion(_anim)
 	# 길들임 표식: 초록 목걸이 구슬
 	var collar := MeshInstance3D.new()
 	var sm := SphereMesh.new()
@@ -93,6 +97,7 @@ func _physics_process(delta: float) -> void:
 		return
 
 	_atk_timer = maxf(0.0, _atk_timer - delta)
+	LowpolyFactory.update_locomotion(_anim, _walk_anim, Vector2(velocity.x, velocity.z).length())
 	if _player == null or not is_instance_valid(_player):
 		_player = get_tree().get_first_node_in_group("player")
 

@@ -45,6 +45,8 @@ func apply_slow(factor: float, duration: float) -> void:
 var _mesh: Node3D
 var _mat: StandardMaterial3D
 var _base_color: Color = Color.WHITE
+var _anim: AnimationPlayer = null
+var _walk_anim: String = ""
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 
 
@@ -91,6 +93,8 @@ func _build_visual() -> void:
 		_mesh = built
 	add_child(_mesh)
 	add_child(LowpolyFactory.make_blob_shadow(maxf(sz.x, sz.z) * 0.55))  # 발밑 그림자
+	_anim = LowpolyFactory.find_anim_player(built)
+	_walk_anim = LowpolyFactory.pick_locomotion(_anim)
 
 	var cs := CollisionShape3D.new()
 	var box := BoxShape3D.new()
@@ -111,6 +115,7 @@ func _physics_process(delta: float) -> void:
 		_slow_time -= delta
 		if _slow_time <= 0.0:
 			_slow_factor = 1.0
+	LowpolyFactory.update_locomotion(_anim, _walk_anim, Vector2(velocity.x, velocity.z).length())
 
 	# 중력
 	if not is_on_floor():

@@ -39,6 +39,8 @@ var _indicator: Node3D = null     # 공격 예고 바닥 마커
 
 var _pivot: Node3D
 var _mat: StandardMaterial3D
+var _anim: AnimationPlayer = null
+var _walk_anim: String = ""
 var _base_color: Color = Color.WHITE
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 
@@ -86,9 +88,14 @@ func _build_visual() -> void:
 	_base_color = Color.html(_def.get("color", "#4a6e34"))
 	_pivot = Node3D.new()
 	add_child(_pivot)
-	var visual: Node3D = LowpolyFactory.build(sz, _base_color, _def.get("model", ""), false, _def.get("shape", "segmented"))
+	var model_path: String = _def.get("model", "")
+	var visual: Node3D = LowpolyFactory.build(sz, _base_color, model_path, false, _def.get("shape", "segmented"))
+	if model_path != "" and ResourceLoader.exists(model_path):
+		visual.rotation.y = PI  # -Z 정면 모델 보정
 	_pivot.add_child(visual)
-	_mat = LowpolyFactory.last_material  # 본체 머티리얼(플래시/광폭화 틴트용)
+	_mat = LowpolyFactory.last_material  # 본체 머티리얼(플래시/광폭화 틴트용, 모델이면 null)
+	_anim = LowpolyFactory.find_anim_player(visual)
+	_walk_anim = LowpolyFactory.pick_locomotion(_anim)
 
 	var cs := CollisionShape3D.new()
 	var box := BoxShape3D.new()
@@ -107,6 +114,7 @@ func get_display_name() -> String:
 func _physics_process(delta: float) -> void:
 	_attack_cd = maxf(0.0, _attack_cd - delta)
 	_summon_cd = maxf(0.0, _summon_cd - delta)
+	LowpolyFactory.update_locomotion(_anim, _walk_anim, Vector2(velocity.x, velocity.z).length())
 
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
