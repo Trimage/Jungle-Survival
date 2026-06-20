@@ -1,0 +1,45 @@
+[gd_scene load_steps=9 format=3 uid="uid://e0main00vt01"]
+
+[ext_resource type="PackedScene" uid="uid://c0world0vt01" path="res://scenes/world.tscn" id="1_world"]
+[ext_resource type="PackedScene" uid="uid://b1player0vt01" path="res://scenes/player.tscn" id="2_player"]
+[ext_resource type="Script" path="res://scripts/camera_rig.gd" id="3_camrig"]
+[ext_resource type="PackedScene" uid="uid://d0hud00vt01" path="res://ui/hud.tscn" id="4_hud"]
+[ext_resource type="Script" path="res://scripts/build_manager.gd" id="5_build"]
+[ext_resource type="PackedScene" uid="uid://h0building0vt01" path="res://scenes/building.tscn" id="6_bld"]
+[ext_resource type="Script" path="res://scripts/spawn_manager.gd" id="7_spawn"]
+[ext_resource type="PackedScene" uid="uid://i0enemy0vt01" path="res://scenes/enemy.tscn" id="8_enemy"]
+[ext_resource type="PackedScene" uid="uid://j0villager0vt01" path="res://scenes/villager.tscn" id="9_villager"]
+[ext_resource type="PackedScene" uid="uid://k0boss0vt01" path="res://scenes/boss.tscn" id="10_boss"]
+[ext_resource type="Script" path="res://scripts/event_manager.gd" id="11_event"]
+
+[node name="Main" type="Node3D"]
+
+[node name="World" parent="." instance=ExtResource("1_world")]
+
+[node name="Player" parent="." groups=["player"] instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+
+[node name="CameraRig" type="Node3D" parent="."]
+transform = Transform3D(0.7071, 0, 0.7071, 0, 1, 0, -0.7071, 0, 0.7071, 0, 0, 0)
+script = ExtResource("3_camrig")
+
+[node name="Camera" type="Camera3D" parent="CameraRig"]
+transform = Transform3D(1, 0, 0, 0, 0.6428, 0.766, 0, -0.766, 0.6428, 0, 16, 13)
+projection = 1
+current = true
+size = 18.0
+
+[node name="BuildManager" type="Node" parent="."]
+script = ExtResource("5_build")
+building_scene = ExtResource("6_bld")
+
+[node name="SpawnManager" type="Node" parent="."]
+script = ExtResource("7_spawn")
+enemy_scene = ExtResource("8_enemy")
+villager_scene = ExtResource("9_villager")
+boss_scene = ExtResource("10_boss")
+
+[node name="EventManager" type="Node" parent="."]
+script = ExtResource("11_event")
+
+[node name="HUD" parent="." instance=ExtResource("4_hud")]

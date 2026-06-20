@@ -1,0 +1,736 @@
+[gd_scene load_steps=4 format=3 uid="uid://d0hud00vt01"]
+
+[ext_resource type="Script" path="res://ui/hud.gd" id="0_hud"]
+[ext_resource type="Script" path="res://ui/virtual_joystick.gd" id="1_joy"]
+[ext_resource type="Script" path="res://ui/minimap.gd" id="2_mini"]
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("0_hud")
+
+[node name="Joystick" type="Control" parent="."]
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_horizontal = 1
+grow_vertical = 1
+script = ExtResource("1_joy")
+
+[node name="DayLabel" type="Label" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 42.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 22
+text = "☀ 낮  ·  Day 1  ·  07:00"
+horizontal_alignment = 1
+
+[node name="VillageLabel" type="Label" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 44.0
+offset_right = 150.0
+offset_bottom = 70.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 18
+text = "부락민: 0"
+horizontal_alignment = 1
+
+[node name="BossBar" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -230.0
+offset_top = 74.0
+offset_right = 230.0
+offset_bottom = 120.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="BossName" type="Label" parent="BossBar"]
+mouse_filter = 2
+theme_override_font_sizes/font_size = 18
+text = "거대 보아뱀"
+horizontal_alignment = 1
+
+[node name="BossHP" type="ProgressBar" parent="BossBar"]
+custom_minimum_size = Vector2(0, 16)
+mouse_filter = 2
+show_percentage = false
+
+[node name="StatsPanel" type="PanelContainer" parent="."]
+offset_left = 12.0
+offset_top = 124.0
+offset_right = 300.0
+offset_bottom = 300.0
+mouse_filter = 2
+
+[node name="Margin" type="MarginContainer" parent="StatsPanel"]
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Bars" type="VBoxContainer" parent="StatsPanel/Margin"]
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="SaveButton" type="Button" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -124.0
+offset_top = 124.0
+offset_right = -12.0
+offset_bottom = 162.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 18
+text = "저장"
+
+[node name="LoadButton" type="Button" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -124.0
+offset_top = 168.0
+offset_right = -12.0
+offset_bottom = 206.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 16
+text = "불러오기"
+
+[node name="HelpButton" type="Button" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -124.0
+offset_top = 212.0
+offset_right = -12.0
+offset_bottom = 250.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 16
+text = "도움말"
+
+[node name="ActionButton" type="Button" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -180.0
+offset_top = -190.0
+offset_right = -24.0
+offset_bottom = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 32
+text = "행동"
+
+[node name="DodgeButton" type="Button" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -170.0
+offset_top = -288.0
+offset_right = -34.0
+offset_bottom = -208.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 26
+text = "회피"
+
+[node name="BuildButton" type="Button" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -170.0
+offset_top = -380.0
+offset_right = -34.0
+offset_bottom = -314.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 22
+text = "건설"
+
+[node name="CraftButton" type="Button" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -170.0
+offset_top = -470.0
+offset_right = -34.0
+offset_bottom = -404.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 22
+text = "제작"
+
+[node name="InventoryButton" type="Button" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -170.0
+offset_top = -560.0
+offset_right = -34.0
+offset_bottom = -494.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 22
+text = "가방"
+
+[node name="InventoryPanel" type="PanelContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -270.0
+offset_top = -300.0
+offset_right = 270.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="InventoryPanel"]
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="InventoryPanel/Margin"]
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="InventoryPanel/Margin/VBox"]
+theme_override_font_sizes/font_size = 24
+text = "인벤토리"
+horizontal_alignment = 1
+
+[node name="Grid" type="GridContainer" parent="InventoryPanel/Margin/VBox"]
+columns = 4
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="CraftPanel" type="PanelContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -260.0
+offset_right = 300.0
+offset_bottom = 260.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="CraftPanel"]
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="CraftPanel/Margin"]
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="CraftPanel/Margin/VBox"]
+theme_override_font_sizes/font_size = 24
+text = "제작"
+horizontal_alignment = 1
+
+[node name="List" type="VBoxContainer" parent="CraftPanel/Margin/VBox"]
+theme_override_constants/separation = 8
+
+[node name="BuildPanel" type="PanelContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -260.0
+offset_right = 300.0
+offset_bottom = 260.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="BuildPanel"]
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="BuildPanel/Margin"]
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="BuildPanel/Margin/VBox"]
+theme_override_font_sizes/font_size = 24
+text = "건설"
+horizontal_alignment = 1
+
+[node name="List" type="VBoxContainer" parent="BuildPanel/Margin/VBox"]
+theme_override_constants/separation = 8
+
+[node name="BuildHint" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -170.0
+offset_right = 300.0
+offset_bottom = -134.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 20
+text = "이동해 위치를 정하고 [확정]"
+horizontal_alignment = 1
+
+[node name="BuildControls" type="HBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -180.0
+offset_top = -116.0
+offset_right = 180.0
+offset_bottom = -46.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="ConfirmButton" type="Button" parent="BuildControls"]
+custom_minimum_size = Vector2(150, 56)
+theme_override_font_sizes/font_size = 26
+text = "확정"
+
+[node name="CancelButton" type="Button" parent="BuildControls"]
+custom_minimum_size = Vector2(150, 56)
+theme_override_font_sizes/font_size = 26
+text = "취소"
+
+[node name="TutorialHint" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -320.0
+offset_top = -620.0
+offset_right = 320.0
+offset_bottom = -566.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 19
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Toast" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 0.32
+anchor_right = 0.5
+anchor_bottom = 0.32
+offset_left = -240.0
+offset_top = -24.0
+offset_right = 240.0
+offset_bottom = 24.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 28
+text = ""
+horizontal_alignment = 1
+
+[node name="HelpPanel" type="PanelContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -340.0
+offset_right = 320.0
+offset_bottom = 340.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="HelpPanel"]
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="HelpPanel/Margin"]
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="HelpPanel/Margin/VBox"]
+theme_override_font_sizes/font_size = 26
+text = "도움말"
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="HelpPanel/Margin/VBox"]
+theme_override_font_sizes/font_size = 18
+text = "• 이동: 화면 왼쪽을 드래그
+• 행동: 채집 / 영입 / 직업변경 / 공격 (상황별)
+• 회피: 짧게 대시하며 무적
+• 가방: 자원 확인 + 아이템 탭해 사용/장착
+   (음식·물=회복, 돌칼=공격력, 횃불=야간 시야)
+• 제작: 도구·음식·약 (일부는 작업대 필요)
+• 건설: 모닥불(안전지대)·작업대·가시방벽·오두막
+• 오두막: 부락 정원↑ → 떠돌이가 더 모임
+• 부락민 직업: 채집/사냥/정비/약초(치유)/요리
+• 미니맵(우상단): 자원·적·건물·부락민 위치
+• 밤: 맹수가 부락민·건물도 공격! 보호 필수
+   (3일째 보스, 5일째 최종 보스)
+• 위쪽 II: 일시정지 / 저장·불러오기"
+autowrap_mode = 2
+
+[node name="VolumeLabel" type="Label" parent="HelpPanel/Margin/VBox"]
+theme_override_font_sizes/font_size = 18
+text = "전체 음량"
+
+[node name="VolumeSlider" type="HSlider" parent="HelpPanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 32)
+min_value = 0.0
+max_value = 1.0
+step = 0.05
+value = 1.0
+
+[node name="MusicLabel" type="Label" parent="HelpPanel/Margin/VBox"]
+theme_override_font_sizes/font_size = 18
+text = "음악"
+
+[node name="MusicSlider" type="HSlider" parent="HelpPanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 32)
+min_value = 0.0
+max_value = 1.0
+step = 0.05
+value = 1.0
+
+[node name="SfxLabel" type="Label" parent="HelpPanel/Margin/VBox"]
+theme_override_font_sizes/font_size = 18
+text = "효과음"
+
+[node name="SfxSlider" type="HSlider" parent="HelpPanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 32)
+min_value = 0.0
+max_value = 1.0
+step = 0.05
+value = 1.0
+
+[node name="HapticsCheck" type="CheckButton" parent="HelpPanel/Margin/VBox"]
+theme_override_font_sizes/font_size = 18
+button_pressed = true
+text = "진동(햅틱)"
+
+[node name="CloseButton" type="Button" parent="HelpPanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 44)
+theme_override_font_sizes/font_size = 20
+text = "닫기"
+
+[node name="DeathOverlay" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="DeathOverlay"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="VBox" type="VBoxContainer" parent="DeathOverlay"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -90.0
+offset_right = 200.0
+offset_bottom = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="DeathLabel" type="Label" parent="DeathOverlay/VBox"]
+theme_override_font_sizes/font_size = 32
+text = "💀 사망
+당신은 정글에 삼켜졌다"
+horizontal_alignment = 1
+
+[node name="ReviveButton" type="Button" parent="DeathOverlay/VBox"]
+custom_minimum_size = Vector2(220, 64)
+theme_override_font_sizes/font_size = 28
+text = "부활"
+
+[node name="VictoryOverlay" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="VictoryOverlay"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.15, 0.05, 0.75)
+
+[node name="VBox" type="VBoxContainer" parent="VictoryOverlay"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -110.0
+offset_right = 220.0
+offset_bottom = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="WinLabel" type="Label" parent="VictoryOverlay/VBox"]
+theme_override_font_sizes/font_size = 34
+text = "🏆 승리!
+정글의 지배자를 물리쳤다"
+horizontal_alignment = 1
+
+[node name="ContinueButton" type="Button" parent="VictoryOverlay/VBox"]
+custom_minimum_size = Vector2(240, 60)
+theme_override_font_sizes/font_size = 26
+text = "계속하기"
+
+[node name="RestartButton" type="Button" parent="VictoryOverlay/VBox"]
+custom_minimum_size = Vector2(240, 60)
+theme_override_font_sizes/font_size = 26
+text = "다시 시작"
+
+[node name="Minimap" type="Control" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -150.0
+offset_top = 262.0
+offset_right = -20.0
+offset_bottom = 392.0
+grow_horizontal = 0
+mouse_filter = 2
+script = ExtResource("2_mini")
+
+[node name="PauseButton" type="Button" parent="."]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 80.0
+offset_bottom = 60.0
+theme_override_font_sizes/font_size = 24
+text = "II"
+
+[node name="PauseOverlay" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="PauseOverlay"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="VBox" type="VBoxContainer" parent="PauseOverlay"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -110.0
+offset_right = 160.0
+offset_bottom = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="PauseLabel" type="Label" parent="PauseOverlay/VBox"]
+theme_override_font_sizes/font_size = 34
+text = "일시정지"
+horizontal_alignment = 1
+
+[node name="ResumeButton" type="Button" parent="PauseOverlay/VBox"]
+custom_minimum_size = Vector2(240, 60)
+theme_override_font_sizes/font_size = 26
+text = "계속하기"
+
+[node name="PauseRestartButton" type="Button" parent="PauseOverlay/VBox"]
+custom_minimum_size = Vector2(240, 60)
+theme_override_font_sizes/font_size = 26
+text = "다시 시작"
+
+[node name="BossBanner" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 0.4
+anchor_right = 0.5
+anchor_bottom = 0.4
+offset_left = -320.0
+offset_top = -40.0
+offset_right = 320.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.25, 1)
+theme_override_font_sizes/font_size = 40
+text = "⚠ 보스 출현 ⚠"
+horizontal_alignment = 1
+
+[node name="SavePanel" type="PanelContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -270.0
+offset_top = -210.0
+offset_right = 270.0
+offset_bottom = 210.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="SavePanel"]
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="SavePanel/Margin"]
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="SavePanel/Margin/VBox"]
+theme_override_font_sizes/font_size = 24
+text = "저장 / 불러오기"
+horizontal_alignment = 1
+
+[node name="SlotList" type="VBoxContainer" parent="SavePanel/Margin/VBox"]
+theme_override_constants/separation = 10
+
+[node name="CloseButton" type="Button" parent="SavePanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 44)
+theme_override_font_sizes/font_size = 20
+text = "닫기"
+
+[node name="RallyButton" type="Button" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -170.0
+offset_top = -650.0
+offset_right = -34.0
+offset_bottom = -584.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 20
+text = "집결"
+
+[node name="EventTint" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="IntroOverlay" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="IntroOverlay"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.1, 0.07, 0.92)
+
+[node name="VBox" type="VBoxContainer" parent="IntroOverlay"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -220.0
+offset_right = 300.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 28
+alignment = 1
+
+[node name="Story" type="Label" parent="IntroOverlay/VBox"]
+theme_override_colors/font_color = Color(0.85, 0.95, 0.78, 1)
+theme_override_font_sizes/font_size = 24
+text = "문명이 무너진 지 100년.
+정글이 도시를, 사람을, 기억을 삼켰다.
+
+당신은 마지막 생존자들을 이끌고
+폐허 속에 새 부락을 세운다.
+
+낮엔 모으고 짓고, 밤엔 맞서 싸워라.
+정글의 지배자를 쓰러뜨리는 그날까지."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="StartButton" type="Button" parent="IntroOverlay/VBox"]
+custom_minimum_size = Vector2(260, 64)
+theme_override_font_sizes/font_size = 28
+text = "생존 시작"
+
+[node name="EndingOverlay" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+visible = false
+
+[node name="Dim" type="ColorRect" parent="EndingOverlay"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.04, 0.05, 0.08, 1)
+
+[node name="VBox" type="VBoxContainer" parent="EndingOverlay"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -140.0
+offset_right = 320.0
+offset_bottom = 140.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 26
+alignment = 1
+
+[node name="Story" type="Label" parent="EndingOverlay/VBox"]
+theme_override_colors/font_color = Color(0.88, 0.95, 0.8, 1)
+theme_override_font_sizes/font_size = 28
+text = "정글의 지배자가 쓰러졌다.
+
+부락은 살아남았고, 새벽이 밝아온다.
+그러나 정글은 결코 잠들지 않는다…"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="ResultButton" type="Button" parent="EndingOverlay/VBox"]
+custom_minimum_size = Vector2(260, 64)
+theme_override_font_sizes/font_size = 28
+text = "결과 보기"

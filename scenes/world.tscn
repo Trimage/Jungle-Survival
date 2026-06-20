@@ -1,0 +1,160 @@
+[gd_scene load_steps=11 format=3 uid="uid://c0world0vt01"]
+
+[ext_resource type="Script" path="res://scripts/day_night_cycle.gd" id="1_daynight"]
+[ext_resource type="PackedScene" uid="uid://g0resnode0vt01" path="res://scenes/resource_node.tscn" id="2_resnode"]
+[ext_resource type="Script" path="res://scripts/decor.gd" id="3_decor"]
+[ext_resource type="Script" path="res://scripts/terrain.gd" id="4_terrain"]
+
+[sub_resource type="ProceduralSkyMaterial" id="Sky_mat"]
+sky_top_color = Color(0.45, 0.7, 0.95, 1)
+sky_horizon_color = Color(0.75, 0.85, 0.8, 1)
+ground_bottom_color = Color(0.3, 0.35, 0.25, 1)
+ground_horizon_color = Color(0.75, 0.85, 0.8, 1)
+
+[sub_resource type="Sky" id="Sky"]
+sky_material = SubResource("Sky_mat")
+
+[sub_resource type="Environment" id="Env"]
+background_mode = 2
+sky = SubResource("Sky")
+ambient_light_source = 2
+ambient_light_color = Color(0.78, 0.82, 0.78, 1)
+ambient_light_energy = 0.75
+tonemap_mode = 2
+tonemap_white = 1.2
+ssao_enabled = true
+ssao_radius = 1.4
+ssao_intensity = 0.9
+ssao_power = 2.0
+glow_enabled = true
+glow_intensity = 0.5
+glow_strength = 1.1
+glow_bloom = 0.05
+glow_hdr_threshold = 0.95
+glow_blend_mode = 1
+fog_enabled = true
+fog_light_color = Color(0.55, 0.68, 0.55, 1)
+fog_light_energy = 0.6
+fog_density = 0.006
+fog_sky_affect = 0.0
+fog_aerial_perspective = 0.3
+adjustment_enabled = true
+adjustment_brightness = 1.06
+adjustment_contrast = 1.1
+adjustment_saturation = 1.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_ground"]
+size = Vector3(60, 1, 60)
+
+[sub_resource type="StandardMaterial3D" id="Mat_ground"]
+albedo_color = Color(0.42, 0.62, 0.33, 1)
+roughness = 1.0
+metallic = 0.0
+
+[sub_resource type="BoxShape3D" id="Shape_ground"]
+size = Vector3(60, 1, 60)
+
+[node name="World" type="Node3D"]
+script = ExtResource("1_daynight")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.819152, -0.401509, 0.409576, 0, 0.713251, 0.700909, -0.573577, -0.574227, 0.585689, 0, 12, 0)
+light_color = Color(1, 0.96, 0.86, 1)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="Ground" type="StaticBody3D" parent="."]
+
+[node name="GroundMesh" type="MeshInstance3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+mesh = SubResource("BoxMesh_ground")
+surface_material_override/0 = SubResource("Mat_ground")
+
+[node name="GroundCollision" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("Shape_ground")
+
+[node name="Tree1" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -6)
+node_type = "tree"
+
+[node name="Tree2" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 4)
+node_type = "tree"
+
+[node name="Herb1" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -8)
+node_type = "herb_bush"
+
+[node name="Herb2" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 8)
+node_type = "herb_bush"
+
+[node name="Berry1" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 2)
+node_type = "berry"
+
+[node name="Berry2" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -4)
+node_type = "berry"
+
+[node name="Scrap1" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 12)
+node_type = "scrap_pile"
+
+[node name="Scrap2" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 10)
+node_type = "scrap_pile"
+
+[node name="Ruin1" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, -10)
+node_type = "ruin_dig"
+
+[node name="Ruin2" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 14)
+node_type = "ruin_dig"
+
+[node name="Water1" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -2)
+node_type = "water_pool"
+
+[node name="Water2" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, -10)
+node_type = "water_pool"
+
+[node name="Rock1" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 7)
+node_type = "rock"
+
+[node name="Rock2" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, -7)
+node_type = "rock"
+
+[node name="Vine1" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -8)
+node_type = "vine"
+
+[node name="Vine2" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 11)
+node_type = "vine"
+
+[node name="Clay1" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0, 6)
+node_type = "clay_pit"
+
+[node name="Crystal1" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 2)
+node_type = "crystal"
+
+[node name="Mushroom1" parent="." instance=ExtResource("2_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -15)
+node_type = "mushroom_log"
+
+[node name="Terrain" type="Node3D" parent="."]
+script = ExtResource("4_terrain")
+
+[node name="Decor" type="Node3D" parent="."]
+script = ExtResource("3_decor")

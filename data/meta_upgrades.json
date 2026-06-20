@@ -1,0 +1,9 @@
+{
+  "vigor":      { "name": "불굴의 생명",   "icon": "❤",  "desc": "시작 최대 체력 +15",            "stat": "max_hp",    "per_level": 15.0, "max": 5, "cost": 8,  "cost_growth": 1.6 },
+  "might":      { "name": "타고난 힘",     "icon": "⚔",  "desc": "시작 공격력 +3",                "stat": "atk",       "per_level": 3.0,  "max": 5, "cost": 8,  "cost_growth": 1.6 },
+  "agility":    { "name": "날렵한 본능",   "icon": "💨", "desc": "시작 이동속도 +0.3",            "stat": "speed",     "per_level": 0.3,  "max": 4, "cost": 10, "cost_growth": 1.7 },
+  "sage_blood": { "name": "현자의 피",     "icon": "📘", "desc": "경험치 획득 영구 +10%",         "stat": "xp_gain",   "per_level": 0.10, "max": 5, "cost": 10, "cost_growth": 1.7 },
+  "stockpile":  { "name": "비축",          "icon": "📦", "desc": "시작 시 주요 자원 +8",          "stat": "stockpile", "per_level": 8.0,  "max": 3, "cost": 6,  "cost_growth": 2.0 },
+  "armory":     { "name": "무기고",        "icon": "🗡", "desc": "시작 시 돌칼을 장착하고 출발",   "stat": "armory",    "per_level": 1.0,  "max": 1, "cost": 15, "cost_growth": 1.0 },
+  "legacy":     { "name": "유산의 힘",     "icon": "⭐", "desc": "새 게임 시작 시 무작위 퍽 1개 획득", "stat": "legacy",  "per_level": 1.0,  "max": 3, "cost": 20, "cost_growth": 2.2 }
+}

@@ -1,0 +1,13 @@
+{
+  "sharp_claws": { "name": "날카로운 발톱", "icon": "⚔",  "desc": "공격력 +5",          "stat": "atk",          "per_level": 5.0,  "max": 6 },
+  "swift_feet":  { "name": "날쌘 발놀림",   "icon": "💨", "desc": "이동속도 +0.5",       "stat": "speed",        "per_level": 0.5,  "max": 4 },
+  "vitality":    { "name": "강인한 체력",   "icon": "❤",  "desc": "최대 체력 +25",       "stat": "max_hp",       "per_level": 25.0, "max": 5 },
+  "frenzy":      { "name": "광폭화",        "icon": "⚡", "desc": "공격속도 +12%",       "stat": "atk_speed",    "per_level": 0.12, "max": 4 },
+  "bloodthirst": { "name": "흡혈",          "icon": "🩸", "desc": "공격 적중 시 체력 +3", "stat": "lifesteal",    "per_level": 3.0,  "max": 4 },
+  "thick_hide":  { "name": "두꺼운 가죽",   "icon": "🛡", "desc": "받는 피해 -8%",       "stat": "armor",        "per_level": 0.08, "max": 5 },
+  "regrowth":    { "name": "재생",          "icon": "✨", "desc": "체력 자동회복 +1.2/s", "stat": "regen",        "per_level": 1.2,  "max": 4 },
+  "war_cry":     { "name": "전투 함성",     "icon": "📣", "desc": "부락민 공격력 +20%",   "stat": "villager_dmg", "per_level": 0.2,  "max": 4 },
+  "scholar":     { "name": "각성",          "icon": "📘", "desc": "획득 경험치 +15%",     "stat": "xp_gain",      "per_level": 0.15, "max": 4 },
+  "adrenaline":  { "name": "아드레날린",    "icon": "🌀", "desc": "회피 쿨다운 -12%",     "stat": "dodge_cd",     "per_level": 0.12, "max": 3 },
+  "keen_eye":    { "name": "예리한 눈",     "icon": "🎯", "desc": "치명타 확률 +6%",      "stat": "crit",         "per_level": 0.06, "max": 5 }
+}

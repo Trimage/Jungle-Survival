@@ -1,0 +1,33 @@
+{
+  "torch":         { "name": "횃불",        "cost": { "wood": 2, "herb": 1 },                    "result": { "torch": 2 } },
+  "cooked_food":   { "name": "구운식량",    "cost": { "food": 1, "wood": 1 },                    "result": { "cooked_food": 1 } },
+  "rope":          { "name": "밧줄",        "cost": { "fiber": 2 },                              "result": { "rope": 1 } },
+  "bandage":       { "name": "붕대",        "cost": { "fiber": 1, "herb": 1 },                   "result": { "bandage": 2 } },
+  "herb_tea":      { "name": "약초차",      "cost": { "herb": 2, "water": 1, "mushroom": 1 },    "result": { "herb_tea": 2 } },
+  "stone_knife":   { "name": "돌칼",        "cost": { "wood": 2, "scrap": 1 },                   "result": { "stone_knife": 1 }, "station": "workbench" },
+  "spear":         { "name": "돌창",        "cost": { "wood": 2, "stone": 2, "rope": 1 },        "result": { "spear": 1 }, "station": "workbench" },
+  "iron_blade":    { "name": "고철검",      "cost": { "scrap": 4, "wood": 1, "rope": 1 },        "result": { "iron_blade": 1 }, "station": "workbench" },
+  "leather_armor": { "name": "가죽 갑옷",   "cost": { "hide": 3, "fiber": 2 },                   "result": { "leather_armor": 1 }, "station": "workbench" },
+  "brick":         { "name": "벽돌",        "cost": { "clay": 2 },                               "result": { "brick": 2 }, "station": "workbench" },
+  "medkit":        { "name": "응급약",      "cost": { "herb": 3 },                               "result": { "medkit": 1 }, "station": "workbench" },
+  "antidote":      { "name": "해독제",      "cost": { "herb": 2, "water": 1 },                   "result": { "antidote": 1 }, "station": "workbench" },
+  "big_meal":      { "name": "든든한 식사", "cost": { "cooked_food": 1, "food": 1, "water": 1 }, "result": { "big_meal": 1 }, "station": "workbench" },
+  "elixir":        { "name": "영약",        "cost": { "herb": 3, "crystal": 1, "water": 1 },     "result": { "elixir": 1 }, "station": "workbench" },
+
+  "arrow":         { "name": "화살",        "cost": { "wood": 1, "fiber": 1 },                   "result": { "arrow": 4 }, "station": "workbench" },
+  "bow":           { "name": "사냥활",      "cost": { "wood": 3, "rope": 1, "fiber": 2 },        "result": { "bow": 1 }, "station": "workbench" },
+  "bomb":          { "name": "폭탄",        "cost": { "scrap": 2, "clay": 1, "fiber": 1 },       "result": { "bomb": 1 }, "station": "workbench" },
+  "firebomb":      { "name": "화염병",      "cost": { "scrap": 2, "herb": 2, "fiber": 1 },       "result": { "firebomb": 1 }, "station": "workbench" },
+  "lure_meat":     { "name": "미끼 고기",   "cost": { "food": 2, "herb": 1 },                    "result": { "lure_meat": 2 } },
+  "rage_brew":     { "name": "분노의 영약", "cost": { "herb": 2, "mushroom": 1, "water": 1 },    "result": { "rage_brew": 1 }, "station": "workbench" },
+  "swift_tonic":   { "name": "질주 물약",   "cost": { "herb": 1, "water": 1, "fiber": 1 },       "result": { "swift_tonic": 1 }, "station": "workbench" },
+  "iron_skin":     { "name": "철갑 물약",   "cost": { "scrap": 2, "hide": 1 },                   "result": { "iron_skin": 1 }, "station": "workbench" },
+  "land_mine":     { "name": "지뢰",        "cost": { "scrap": 3, "clay": 2 },                   "result": { "land_mine": 1 }, "station": "workbench" },
+  "fire_trap":     { "name": "화염 함정",   "cost": { "scrap": 2, "herb": 2, "clay": 1 },        "result": { "fire_trap": 1 }, "station": "workbench" },
+  "caltrops":      { "name": "마름쇠",      "cost": { "scrap": 3, "stone": 1 },                  "result": { "caltrops": 2 }, "station": "workbench" },
+
+  "venom_dagger":  { "name": "맹독 단검",   "cost": { "serpent_fang": 1, "iron_blade": 1, "scrap": 3 }, "result": { "venom_dagger": 1 }, "station": "forge" },
+  "great_bow":     { "name": "고목 장궁",   "cost": { "ancient_bark": 1, "bow": 1, "rope": 2 },        "result": { "great_bow": 1 }, "station": "forge" },
+  "thorn_plate":   { "name": "가시 흉갑",   "cost": { "thorn_heart": 1, "hide": 5, "scrap": 4 },       "result": { "thorn_plate": 1 }, "station": "forge" },
+  "core_hammer":   { "name": "핵심 망치",   "cost": { "core_shard": 1, "stone": 8, "scrap": 6 },       "result": { "core_hammer": 1 }, "station": "forge" }
+}

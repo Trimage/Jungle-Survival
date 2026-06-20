@@ -1,0 +1,9 @@
+[
+  { "id": "survive3", "name": "3일 생존",       "type": "survive",  "target": 3,   "reward": { "items": { "wood": 10, "food": 5 } } },
+  { "id": "survive7", "name": "7일 생존",       "type": "survive",  "target": 7,   "reward": { "items": { "scrap": 10 }, "legacy": 10 } },
+  { "id": "kill25",   "name": "맹수 25 처치",   "type": "kills",    "target": 25,  "reward": { "items": { "arrow": 15 } } },
+  { "id": "kill100",  "name": "맹수 100 처치",  "type": "kills",    "target": 100, "reward": { "legacy": 15 } },
+  { "id": "boss1",    "name": "보스 처치",       "type": "bosses",   "target": 1,   "reward": { "items": { "crystal": 2 }, "legacy": 10 } },
+  { "id": "build10",  "name": "건물 10채 건설", "type": "builds",   "target": 10,  "reward": { "items": { "stone": 15 } } },
+  { "id": "recruit5", "name": "부락민 5명 영입","type": "recruits", "target": 5,   "reward": { "items": { "food": 10 } } }
+]

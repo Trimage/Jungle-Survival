@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://k0boss0vt01"]
+
+[ext_resource type="Script" path="res://scripts/boss.gd" id="1_boss"]
+
+[node name="Boss" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_boss")

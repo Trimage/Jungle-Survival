@@ -1,0 +1,12 @@
+{
+  "attack":      "res://assets/audio/attack.wav",
+  "hit":         "res://assets/audio/hit.wav",
+  "harvest":     "res://assets/audio/harvest.wav",
+  "build":       "res://assets/audio/build.wav",
+  "craft":       "res://assets/audio/craft.wav",
+  "player_hurt": "res://assets/audio/player_hurt.wav",
+  "recruit":     "res://assets/audio/recruit.wav",
+  "night":       "res://assets/audio/night.wav",
+  "boss_die":    "res://assets/audio/boss_die.wav",
+  "bgm":         "res://assets/audio/bgm.wav"
+}

@@ -1,0 +1,6 @@
+{
+  "rain":   { "name": "🌧 폭우",  "duration": 40.0, "effects": { "thirst": 4.0 },     "tint": "#3a5a8a" },
+  "plague": { "name": "☣ 역병",  "duration": 40.0, "effects": { "infection": 1.4 },  "tint": "#5a3a6a" },
+  "cold":   { "name": "❄ 혹한",  "duration": 40.0, "effects": { "hunger": -2.5 },    "tint": "#6a8aaa" },
+  "heat":   { "name": "🔥 폭염",  "duration": 40.0, "effects": { "thirst": -3.0 },    "tint": "#9a6a3a" }
+}

@@ -1,0 +1,10 @@
+[
+  { "give": { "wood": 12 },              "get": { "stone": 8 } },
+  { "give": { "stone": 12 },             "get": { "wood": 10 } },
+  { "give": { "hide": 4 },               "get": { "scrap": 8 } },
+  { "give": { "food": 15 },              "get": { "crystal": 1 } },
+  { "give": { "crystal": 2 },            "get": { "elixir": 1 } },
+  { "give": { "scrap": 10 },             "get": { "arrow": 12 } },
+  { "give": { "herb": 8 },               "get": { "medkit": 2 } },
+  { "give": { "crystal": 1, "scrap": 5 },"get": { "bomb": 2 } }
+]

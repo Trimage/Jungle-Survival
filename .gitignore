@@ -1,0 +1,13 @@
+# Godot 4 import/cache (재생성됨)
+.godot/
+
+# macOS
+.DS_Store
+
+# 빌드 산출물
+/build/
+*.ipa
+*.apk
+*.aab
+*.pck
+*.tmp

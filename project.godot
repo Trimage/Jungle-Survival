@@ -1,0 +1,50 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
+[application]
+
+config/name="Verdant Tomb"
+config/description="밀림에 삼켜진 폐허에서 생존하는 액션 서바이벌"
+run/main_scene="res://scenes/title.tscn"
+config/features=PackedStringArray("4.6", "Mobile")
+config/icon="res://icon.svg"
+
+[autoload]
+
+ItemDB="*res://scripts/item_db.gd"
+AudioManager="*res://scripts/audio_manager.gd"
+SaveManager="*res://scripts/save_manager.gd"
+GameState="*res://scripts/game_state.gd"
+MetaManager="*res://scripts/meta_manager.gd"
+
+[display]
+
+window/size/viewport_width=720
+window/size/viewport_height=1280
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation="portrait"
+
+[gui]
+
+theme/custom="res://ui/theme.tres"
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[rendering]
+
+renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true

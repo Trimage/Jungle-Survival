@@ -1,0 +1,7 @@
+[
+  { "id": "masonry",  "name": "석공술",  "cost": { "stone": 15, "wood": 10 },  "unlocks": ["stone_wall", "brick_wall", "quarry"],            "prereq": [] },
+  { "id": "defense",  "name": "방어술",  "cost": { "wood": 15, "scrap": 10 },  "unlocks": ["watchtower", "ballista", "gate"],                "prereq": ["masonry"] },
+  { "id": "smithing", "name": "제련술",  "cost": { "scrap": 20, "stone": 10 }, "unlocks": ["forge", "iron_blade", "leather_armor"],          "prereq": [] },
+  { "id": "alchemy",  "name": "연금술",  "cost": { "herb": 15, "crystal": 2 }, "unlocks": ["rage_brew", "swift_tonic", "iron_skin", "elixir"],"prereq": [] },
+  { "id": "survival", "name": "생존술",  "cost": { "wood": 12, "fiber": 8 },   "unlocks": ["infirmary", "bed", "storage", "war_totem"],      "prereq": [] }
+]
