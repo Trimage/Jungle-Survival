@@ -3,10 +3,12 @@ extends Area3D
 ## - 그룹 "chest", player._try_open_chest 가 근접 시 open() 호출.
 ## - tier: "common"(맵) / "boss"(보스 보상, 더 풍성 + 발광).
 
+const CHEST_MODEL := "res://assets/models/dungeon/chest_gold.glb"
+
 var _tier: String = "common"
 var _loot: Dictionary = {}
 var _opened: bool = false
-var _box: MeshInstance3D
+var _box: Node3D
 var _lid: MeshInstance3D
 
 
@@ -30,29 +32,34 @@ func _ready() -> void:
 
 func _build_visual() -> void:
 	var boss: bool = _tier == "boss"
-	_box = MeshInstance3D.new()
-	var bm := BoxMesh.new()
-	bm.size = Vector3(0.9, 0.66, 0.7)
-	_box.mesh = bm
-	_box.position.y = 0.33
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.62, 0.55, 0.22) if boss else Color(0.5, 0.34, 0.18)
-	mat.roughness = 1.0
-	_box.material_override = mat
-	add_child(_box)
+	# CC0 보물상자 모델 우선, 없으면 절차적 박스+뚜껑
+	if ResourceLoader.exists(CHEST_MODEL):
+		_box = LowpolyFactory.build(Vector3(0.95, 0.7, 0.75), Color.WHITE, CHEST_MODEL, false)
+		add_child(_box)
+	else:
+		_box = MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(0.9, 0.66, 0.7)
+		_box.mesh = bm
+		_box.position.y = 0.33
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = Color(0.62, 0.55, 0.22) if boss else Color(0.5, 0.34, 0.18)
+		mat.roughness = 1.0
+		_box.material_override = mat
+		add_child(_box)
 
-	_lid = MeshInstance3D.new()
-	var lm := BoxMesh.new()
-	lm.size = Vector3(0.96, 0.2, 0.76)
-	_lid.mesh = lm
-	_lid.position.y = 0.74
-	var lmat := StandardMaterial3D.new()
-	lmat.albedo_color = Color(0.9, 0.72, 0.28)
-	lmat.emission_enabled = true
-	lmat.emission = Color(0.9, 0.66, 0.2)
-	lmat.emission_energy_multiplier = 1.4 if boss else 0.7
-	_lid.material_override = lmat
-	add_child(_lid)
+		_lid = MeshInstance3D.new()
+		var lm := BoxMesh.new()
+		lm.size = Vector3(0.96, 0.2, 0.76)
+		_lid.mesh = lm
+		_lid.position.y = 0.74
+		var lmat := StandardMaterial3D.new()
+		lmat.albedo_color = Color(0.9, 0.72, 0.28)
+		lmat.emission_enabled = true
+		lmat.emission = Color(0.9, 0.66, 0.2)
+		lmat.emission_energy_multiplier = 1.4 if boss else 0.7
+		_lid.material_override = lmat
+		add_child(_lid)
 
 	# 반짝이는 유혹 파티클
 	var p := CPUParticles3D.new()
@@ -83,10 +90,11 @@ func open(_inv: Node) -> bool:
 	GameState.shake(0.22)
 	GameState.vibrate(80)
 	AudioManager.play("craft")
-	# 뚜껑 열림 후 사라짐
+	# 뚜껑 열림(절차적일 때만) 후 사라짐
 	var tw := create_tween()
-	tw.tween_property(_lid, "rotation:x", -1.2, 0.18)
-	tw.tween_interval(0.1)
+	if _lid:
+		tw.tween_property(_lid, "rotation:x", -1.2, 0.18)
+		tw.tween_interval(0.1)
 	tw.tween_property(self, "scale", Vector3(1.1, 0.05, 1.1), 0.2)
 	tw.tween_callback(queue_free)
 	return true
