@@ -1,7 +1,12 @@
 extends Node3D
-## 독특한 지형 생성 (콘텐츠 확장)
-## - 연못 / 흙 공터 / 낮은 언덕(시각) / 고대 폐허 기둥·아치(충돌=엄폐물)
+## 독특한 지형 생성 (콘텐츠 확장 + 고급 디자인)
+## - 연못 / 흙 공터 / 걸어 오르는 고지대 / 고대 폐허 / KayKit 헥사곤 자연 장식
 ## - "정글에 삼켜진 옛 문명의 잔해" 분위기. 시작 시 한 번 생성.
+
+const NATURE := "res://assets/models/hexagon/nature/"
+const DECO_TREES := ["tree_single_A", "tree_single_B", "trees_A_large", "trees_A_medium", "trees_B_large", "trees_B_medium"]
+const DECO_ROCKS := ["rock_single_A", "rock_single_B", "rock_single_C", "rock_single_D"]
+const DECO_WATER := ["waterplant_A", "waterlily_A"]
 
 
 func _ready() -> void:
@@ -100,37 +105,32 @@ func _walkable_hill(center: Vector3, base_r: float, top_r: float, height: float)
 	body.add_child(cap)
 
 
-## 맵 장식 산포: 나무 + 바위(외곽, 비충돌)
+## 맵 장식 산포: 헥사곤 나무 + 바위 + 연못 수생식물(건물과 통일된 고급 룩, 비충돌)
 func _decorate() -> void:
-	for _i in 16:
+	for _i in 20:
 		var a := randf() * TAU
-		var r := randf_range(11.0, 26.0)
-		_deco_tree(Vector3(cos(a) * r, 0.0, sin(a) * r))
-	for _j in 18:
+		var r := randf_range(11.0, 26.5)
+		_deco(DECO_TREES.pick_random(), Vector3(cos(a) * r, 0.0, sin(a) * r), randf_range(2.6, 3.8))
+	for _j in 16:
 		var a2 := randf() * TAU
 		var r2 := randf_range(9.0, 27.0)
-		_deco_rock(Vector3(cos(a2) * r2, 0.0, sin(a2) * r2), randf_range(0.45, 1.0))
+		_deco(DECO_ROCKS.pick_random(), Vector3(cos(a2) * r2, 0.0, sin(a2) * r2), randf_range(0.9, 1.7))
+	# 연못((-16,-13), r7) 주변 수생식물
+	for _k in 7:
+		var a3 := randf() * TAU
+		var rr := randf_range(2.0, 6.5)
+		_deco(DECO_WATER.pick_random(), Vector3(-16, 0.05, -13) + Vector3(cos(a3) * rr, 0.0, sin(a3) * rr), randf_range(0.5, 0.9))
 
 
-func _deco_tree(pos: Vector3) -> void:
-	var sz := Vector3(randf_range(1.6, 2.4), randf_range(2.6, 3.6), randf_range(1.6, 2.4))
-	var vis: Node3D = LowpolyFactory.build(sz, Color(0.3, 0.55, 0.3), "", false, "tree")
+## 자연 모델 1개 배치(높이에 맞춰 자동 스케일, 랜덤 회전, 비충돌)
+func _deco(model_name: String, pos: Vector3, height: float) -> void:
+	var path := NATURE + model_name + ".gltf"
+	if not ResourceLoader.exists(path):
+		return
+	var vis: Node3D = LowpolyFactory.build(Vector3(height, height, height), Color.WHITE, path, false)
 	add_child(vis)
 	vis.position = pos
 	vis.rotation.y = randf() * TAU
-
-
-func _deco_rock(pos: Vector3, s: float) -> void:
-	var mi := MeshInstance3D.new()
-	var sm := SphereMesh.new()
-	sm.radius = s
-	sm.height = s * 1.4
-	mi.mesh = sm
-	mi.position = pos + Vector3(0.0, s * 0.3, 0.0)
-	mi.scale = Vector3(1.0, randf_range(0.55, 0.85), 1.0)
-	mi.rotation.y = randf() * TAU
-	mi.material_override = _outlined(Color(0.5, 0.5, 0.53).darkened(randf() * 0.12))
-	add_child(mi)
 
 
 # 부서진 기둥 1개(충돌 있는 StaticBody)
