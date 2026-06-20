@@ -90,9 +90,7 @@ func _build_visual() -> void:
 	add_child(_pivot)
 	var model_path: String = _def.get("model", "")
 	var visual: Node3D = LowpolyFactory.build(sz, _base_color, model_path, false, _def.get("shape", "segmented"))
-	if model_path != "" and ResourceLoader.exists(model_path):
-		visual.rotation.y = PI  # -Z 정면 모델 보정
-	_pivot.add_child(visual)
+	_pivot.add_child(visual)  # 모델 정면이 +Z라 추가 회전 불필요
 	_mat = LowpolyFactory.last_material  # 본체 머티리얼(플래시/광폭화 틴트용, 모델이면 null)
 	_anim = LowpolyFactory.find_anim_player(visual)
 	_walk_anim = LowpolyFactory.pick_locomotion(_anim)

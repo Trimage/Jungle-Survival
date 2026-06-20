@@ -84,8 +84,7 @@ func _build_visual() -> void:
 	var built: Node3D = LowpolyFactory.build(sz, _base_color, model_path, false, _def.get("shape", "box"))
 	_mat = LowpolyFactory.last_material  # 본체 머티리얼(모델이면 null)
 	if model_path != "" and ResourceLoader.exists(model_path):
-		# -Z 정면 모델 보정: PI 회전한 자식을 래퍼로 감싸 _face 회전과 분리
-		built.rotation.y = PI
+		# 모델을 래퍼로 감싸 _face 회전과 분리(모델 정면 +Z, 추가 회전 불필요)
 		var wrapper := Node3D.new()
 		wrapper.add_child(built)
 		_mesh = wrapper

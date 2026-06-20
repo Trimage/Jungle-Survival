@@ -105,8 +105,7 @@ func _apply_character_model() -> void:
 		if mi:
 			mi.visible = false
 	var vis: Node3D = LowpolyFactory.build(Vector3(0.8, 1.7, 0.8), Color.WHITE, PLAYER_MODEL, false)
-	vis.rotation.y = PI  # -Z 정면 모델을 게임 정면(+Z)에 맞춤
-	_mesh_pivot.add_child(vis)
+	_mesh_pivot.add_child(vis)  # 모델 정면이 +Z라 추가 회전 불필요
 	_anim = LowpolyFactory.find_anim_player(vis)
 	_walk_anim = LowpolyFactory.pick_locomotion(_anim)
 
