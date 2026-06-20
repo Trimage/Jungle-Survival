@@ -25,6 +25,8 @@ func _ready() -> void:
 	_boundary(29.0)
 	# 장식 산포(나무·바위)로 맵 디자인
 	_decorate()
+	# 길찾기 내비게이션(부락민이 건물을 돌아서 이동)
+	_setup_nav.call_deferred()
 
 
 func _mat(c: Color) -> StandardMaterial3D:
@@ -59,6 +61,50 @@ func _patch(pos: Vector3, r: float, col: Color) -> void:
 	mi.position = pos + Vector3(0, 0.05, 0)
 	mi.material_override = _mat(col)
 	add_child(mi)
+
+
+## === 길찾기 내비게이션 ===
+var _nav: NavigationRegion3D = null
+var _rebake_pending: bool = false
+
+func _setup_nav() -> void:
+	# 지형 정적바디 + 바닥을 내비게이션 소스 그룹에 등록
+	var ground := get_parent().get_node_or_null("Ground")
+	if ground:
+		ground.add_to_group("nav_source")
+	for c in get_children():
+		if c is StaticBody3D:
+			c.add_to_group("nav_source")
+	_nav = NavigationRegion3D.new()
+	var nm := NavigationMesh.new()
+	nm.cell_size = 0.25
+	nm.cell_height = 0.2
+	nm.agent_radius = 0.5
+	nm.agent_height = 1.4
+	nm.agent_max_climb = 0.5
+	nm.agent_max_slope = 45.0
+	nm.geometry_parsed_geometry_type = NavigationMesh.PARSED_GEOMETRY_STATIC_COLLIDERS
+	nm.geometry_source_geometry_mode = NavigationMesh.SOURCE_GEOMETRY_GROUPS_WITH_CHILDREN
+	nm.geometry_source_group_name = "nav_source"
+	nm.geometry_collision_mask = 1 | 16  # 지형(1) + 건물(16)
+	_nav.navigation_mesh = nm
+	add_child(_nav)
+	add_to_group("nav_baker")
+	_do_rebake()
+
+
+## 건물 변경 시 호출(디바운스). 0.4초 뒤 한 번만 재베이크.
+func request_rebake() -> void:
+	if _rebake_pending or _nav == null:
+		return
+	_rebake_pending = true
+	get_tree().create_timer(0.4).timeout.connect(_do_rebake)
+
+
+func _do_rebake() -> void:
+	_rebake_pending = false
+	if _nav and is_instance_valid(_nav):
+		_nav.bake_navigation_mesh()  # 스레드 비동기
 
 
 ## 외곽선 머티리얼

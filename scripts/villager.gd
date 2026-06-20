@@ -44,6 +44,7 @@ var _mat: StandardMaterial3D
 var _anim: AnimationPlayer = null
 var _walk_anim: String = ""
 var _job_label: Label3D = null
+var _nav_agent: NavigationAgent3D = null
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 var _hp: float = 40.0
 var _max_hp: float = 40.0
@@ -62,6 +63,13 @@ func _ready() -> void:
 	_build_visual()
 	collision_layer = 8
 	collision_mask = 1
+	# 길찾기 에이전트(건물을 돌아서 이동)
+	_nav_agent = NavigationAgent3D.new()
+	_nav_agent.radius = 0.4
+	_nav_agent.height = 1.4
+	_nav_agent.path_desired_distance = 0.7
+	_nav_agent.target_desired_distance = 1.0
+	add_child(_nav_agent)
 	_player = get_tree().get_first_node_in_group("player")
 	if recruited:
 		_become_recruited()
@@ -306,13 +314,26 @@ func _physics_process(delta: float) -> void:
 	LowpolyFactory.update_locomotion(_anim, _walk_anim, Vector2(velocity.x, velocity.z).length())
 
 
+## 목표로 가는 방향(내비메시 길찾기로 건물을 돌아감). 내비 미준비/도달 시 직선/정지.
+func _nav_to(target: Vector3) -> Vector3:
+	if _nav_agent:
+		_nav_agent.target_position = target
+		if _nav_agent.is_target_reachable():
+			var nxt: Vector3 = _nav_agent.get_next_path_position()
+			var nd: Vector3 = nxt - global_position
+			nd.y = 0.0
+			return nd.normalized() if nd.length() > 0.05 else Vector3.ZERO
+	# 폴백: 내비 미준비 시 직선
+	var d: Vector3 = target - global_position
+	d.y = 0.0
+	return d.normalized() if d.length() > 0.05 else Vector3.ZERO
+
+
 func _do_wander(delta: float) -> Vector3:
 	_wander_timer -= delta
 	if _wander_timer <= 0.0 or global_position.distance_to(_wander_target) < 1.0:
 		_pick_wander_target()
-	var d := _wander_target - global_position
-	d.y = 0.0
-	return d.normalized() * 0.5
+	return _nav_to(_wander_target) * 0.5
 
 
 ## 채집꾼/정비공/약초사: 노드로 이동 후 간격마다 채집(직업별 선호 노드)
@@ -325,7 +346,7 @@ func _do_gather(delta: float) -> Vector3:
 	var to: Vector3 = _target_node.global_position - global_position
 	to.y = 0.0
 	if to.length() > 1.8:
-		return to.normalized()
+		return _nav_to(_target_node.global_position)
 	else:
 		_gather_timer -= delta
 		if _gather_timer <= 0.0:
@@ -343,7 +364,7 @@ func _do_hunt(delta: float) -> Vector3:
 	var to: Vector3 = target.global_position - global_position
 	to.y = 0.0
 	if to.length() > _atk_range:
-		return to.normalized()
+		return _nav_to(target.global_position)
 	else:
 		if _atk_timer <= 0.0 and target.has_method("take_damage"):
 			target.take_damage(_atk_damage * (1.0 + GameState.perk_sum("villager_dmg")), global_position)
@@ -386,7 +407,7 @@ func _do_herbalist(delta: float) -> Vector3:
 			st.modify("health", _heal)
 	# 치유 범위를 유지하도록 플레이어를 따라다님
 	if d > 3.0:
-		return to.normalized()
+		return _nav_to(p.global_position)
 	return Vector3.ZERO
 
 
@@ -417,7 +438,7 @@ func _do_rally(delta: float) -> Vector3:
 	var to: Vector3 = p.global_position - global_position
 	to.y = 0.0
 	if to.length() > 2.5:
-		return to.normalized()
+		return _nav_to(p.global_position)
 	return Vector3.ZERO
 
 
@@ -429,7 +450,7 @@ func _do_mechanic(delta: float) -> Vector3:
 	var to: Vector3 = b.global_position - global_position
 	to.y = 0.0
 	if to.length() > 2.2:
-		return to.normalized()
+		return _nav_to(b.global_position)
 	else:
 		_gather_timer -= delta
 		if _gather_timer <= 0.0:

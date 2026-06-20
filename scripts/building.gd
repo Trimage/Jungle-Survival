@@ -80,6 +80,8 @@ func _ready() -> void:
 	if not is_ghost:
 		# 위치는 add_child 이후에 설정되므로(스포너/빌드매니저) 한 프레임 뒤 적용
 		_apply_install_effects.call_deferred()
+		# 내비메시 재베이크(부락민이 새 건물을 돌아가도록)
+		get_tree().call_group.call_deferred("nav_baker", "request_rebake")
 
 
 func _build() -> void:
@@ -98,6 +100,7 @@ func _build() -> void:
 		# 건물 전용 레이어(5번=16). 지형(1)과 분리해 부락민/펫은 통과, 플레이어/적만 막힘
 		collision_layer = 16
 		collision_mask = 0
+		add_to_group("nav_source")  # 부락민 길찾기가 건물을 장애물로 인식
 		var cs := CollisionShape3D.new()
 		var box := BoxShape3D.new()
 		box.size = sz
@@ -131,6 +134,9 @@ func _exit_tree() -> void:
 		var p := get_tree().get_first_node_in_group("player")
 		if p and p.has_method("get_inventory"):
 			p.get_inventory().max_slots = maxi(1, p.get_inventory().max_slots - _storage_cap)
+	# 건물 제거 시 내비메시 재베이크
+	if not is_ghost and get_tree():
+		get_tree().call_group("nav_baker", "request_rebake")
 
 
 func _process(delta: float) -> void:
@@ -220,6 +226,7 @@ func toggle_gate() -> bool:
 		return false
 	_gate_open = not _gate_open
 	collision_layer = 0 if _gate_open else 16
+	get_tree().call_group("nav_baker", "request_rebake")  # 열린 문은 통과 가능
 	# 시각: 열리면 옆으로 슬라이드 + 반투명
 	var tw := create_tween()
 	if _gate_open:
