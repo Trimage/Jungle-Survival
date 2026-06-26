@@ -84,6 +84,20 @@ func _ready() -> void:
 	collision_mask = 1 | 16  # 지형 + 건물
 	_player = get_tree().get_first_node_in_group("player")
 	_summon_cd = summon_interval
+	_spawn_entrance()
+
+
+## 등장 연출: 바닥에서 솟아오르며 포효 + 충격파 링 + 화면 흔들림
+func _spawn_entrance() -> void:
+	if _pivot:
+		_pivot.scale = Vector3(0.2, 0.2, 0.2)
+		var tw := create_tween()
+		tw.tween_property(_pivot, "scale", Vector3.ONE, 0.55).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	AudioManager.play("boss_die")  # 저음 포효(임팩트 사운드 재사용)
+	GameState.shake(0.7)
+	GameState.vibrate(220)
+	GameState.spawn_ring(global_position, Color(0.95, 0.2, 0.2), 6.0, 0.6, 0.2)
+	GameState.spawn_puff(global_position, _base_color, 26)
 
 
 func _build_visual() -> void:

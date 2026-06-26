@@ -12,6 +12,23 @@ const ROCKS := [
 	"res://assets/models/hexagon/nature/rock_single_D.gltf",
 ]
 
+# 바람에 흔들리는 포기들: {node, phase, amp}
+var _swayers: Array = []
+var _wind_t: float = 0.0
+
+
+## 바람 흔들림 대상 등록(포기 단위로 밑동에서 기울어짐)
+func _register_sway(node: Node3D, amp: float) -> void:
+	_swayers.append({"node": node, "phase": randf() * TAU, "amp": amp})
+
+
+func _process(delta: float) -> void:
+	_wind_t += delta
+	for s in _swayers:
+		var n: Node3D = s["node"]
+		if is_instance_valid(n):
+			n.rotation.z = sin(_wind_t * 1.6 + s["phase"]) * s["amp"]
+
 
 func _ready() -> void:
 	for i in count:
@@ -46,6 +63,7 @@ func _grass(pos: Vector3) -> void:
 	var node := Node3D.new()
 	node.position = pos
 	add_child(node)
+	_register_sway(node, 0.14)  # 바람에 흔들리는 풀
 	var col := Color(0.32, 0.55, 0.26).lightened(randf() * 0.12)
 	for j in 3:
 		var mi := MeshInstance3D.new()
@@ -62,6 +80,7 @@ func _flower(pos: Vector3) -> void:
 	var node := Node3D.new()
 	node.position = pos
 	add_child(node)
+	_register_sway(node, 0.08)  # 꽃은 살짝만
 	var stem := MeshInstance3D.new()
 	var sm := BoxMesh.new()
 	sm.size = Vector3(0.08, 0.45, 0.08)

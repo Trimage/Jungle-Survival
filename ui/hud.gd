@@ -94,6 +94,9 @@ var _levelup_title: Label
 var _levelup_choices: VBoxContainer
 var _pending_levels: int = 0
 var _levelup_showing: bool = false
+# === 저체력 적색 비네트 ===
+var _vignette: ColorRect
+var _vignette_target: float = 0.0
 # === 가독성: 야간 습격 경고 ===
 var _raid_label: Label
 # === 연속 처치 콤보 ===
@@ -114,6 +117,7 @@ const TUT_TEXT := [
 
 func _ready() -> void:
 	_build_bars()
+	_setup_vignette()
 	_inv_panel.visible = false
 	_craft_panel.visible = false
 	_build_panel.visible = false
@@ -255,6 +259,12 @@ func _process(delta: float) -> void:
 	_update_boss_bar()
 	_update_raid_warning()
 	_tick_autosave(delta)
+	# 저체력 비네트: 목표치로 부드럽게 + 위급할수록 숨쉬듯 맥동
+	if _vignette:
+		var pulse: float = 1.0
+		if _vignette_target > 0.25:
+			pulse = 0.78 + 0.22 * sin(Time.get_ticks_msec() * 0.006)
+		_vignette.modulate.a = lerpf(_vignette.modulate.a, _vignette_target * pulse, clampf(6.0 * delta, 0.0, 1.0))
 	# 행동 버튼 미리보기: 지금 [행동]을 누르면 무엇을 할지 표시
 	if is_instance_valid(_player) and _player.has_method("peek_action"):
 		var hint: String = _player.peek_action()
@@ -445,6 +455,29 @@ func _try_connect() -> void:
 
 var _warned: Dictionary = {}
 
+## 저체력 적색 비네트(화면 가장자리가 붉게) — 라디얼 셰이더 풀스크린 오버레이
+func _setup_vignette() -> void:
+	_vignette = ColorRect.new()
+	_vignette.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sh := Shader.new()
+	sh.code = """
+shader_type canvas_item;
+void fragment() {
+	vec2 uv = UV - 0.5;
+	float d = length(uv) * 1.45;
+	float v = smoothstep(0.32, 0.85, d);
+	COLOR = vec4(0.82, 0.06, 0.06, v);
+}
+"""
+	var sm := ShaderMaterial.new()
+	sm.shader = sh
+	_vignette.material = sm
+	_vignette.modulate.a = 0.0
+	add_child(_vignette)
+	move_child(_vignette, 0)  # 게임 위, 다른 HUD 아래
+
+
 func _on_stat_changed(key: String, value: float, max_value: float) -> void:
 	if _bars.has(key):
 		_bars[key].value = value
@@ -457,6 +490,10 @@ func _on_stat_changed(key: String, value: float, max_value: float) -> void:
 			AudioManager.play("player_hurt")
 		elif ratio >= 0.35:
 			_warned[key] = false
+	# 체력 비네트: 40% 이하부터 진해짐(최대 0.6)
+	if key == "health" and max_value > 0.0:
+		var hr: float = value / max_value
+		_vignette_target = clampf((0.4 - hr) / 0.4, 0.0, 1.0) * 0.6
 
 
 func _on_time_changed(time_of_day: float, day: int) -> void:

@@ -38,18 +38,47 @@ func _mat(c: Color) -> StandardMaterial3D:
 	return m
 
 
+## 반짝이며 출렁이는 물 셰이더(재사용 가능). 정점 잔물결 + 프래그먼트 윤슬.
+static var _water_shader: Shader = null
+static func _get_water_material() -> ShaderMaterial:
+	if _water_shader == null:
+		_water_shader = Shader.new()
+		_water_shader.code = """
+shader_type spatial;
+render_mode cull_back, diffuse_burley;
+uniform vec3 shallow : source_color = vec3(0.40, 0.72, 0.92);
+uniform vec3 deep : source_color = vec3(0.10, 0.36, 0.60);
+void vertex() {
+	float w = sin((VERTEX.x + TIME * 0.7) * 2.2) * cos((VERTEX.z - TIME * 0.6) * 2.2);
+	VERTEX.y += w * 0.03;
+}
+void fragment() {
+	float t = TIME;
+	float w1 = sin(UV.x * 14.0 + t * 1.3) * cos(UV.y * 14.0 - t * 1.1);
+	float w2 = sin((UV.x * 9.0 - t * 0.8) + (UV.y * 11.0 + t * 0.9));
+	float waves = (w1 + w2) * 0.5;
+	ALBEDO = mix(deep, shallow, 0.5 + 0.4 * waves);
+	ROUGHNESS = 0.12;
+	SPECULAR = 0.7;
+	float glint = smoothstep(0.86, 1.0, waves);
+	EMISSION = vec3(0.6, 0.85, 1.0) * glint * 0.6;
+}
+"""
+	var sm := ShaderMaterial.new()
+	sm.shader = _water_shader
+	return sm
+
+
 func _pond(pos: Vector3, r: float) -> void:
 	var mi := MeshInstance3D.new()
 	var cyl := CylinderMesh.new()
 	cyl.top_radius = r
 	cyl.bottom_radius = r
 	cyl.height = 0.12
+	cyl.radial_segments = 48
 	mi.mesh = cyl
 	mi.position = pos + Vector3(0, 0.07, 0)
-	var m := _mat(Color(0.3, 0.55, 0.8))
-	m.metallic = 0.3
-	m.roughness = 0.2
-	mi.material_override = m
+	mi.material_override = _get_water_material()
 	add_child(mi)
 
 
