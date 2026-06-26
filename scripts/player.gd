@@ -92,6 +92,7 @@ var _anim: AnimationPlayer = null
 var _walk_anim: String = ""
 ## >0 인 동안 행동 원샷 애니 재생 중 → 이동 애니로 덮어쓰지 않음
 var _action_anim_t: float = 0.0
+var _dust_t: float = 0.0   # 발밑 먼지 분사 간격 타이머
 
 
 func _ready() -> void:
@@ -201,6 +202,12 @@ func _physics_process(delta: float) -> void:
 		_mesh_pivot.position.y = absf(sin(_walk_t)) * 0.08
 	else:
 		_mesh_pivot.position.y = lerpf(_mesh_pivot.position.y, 0.0, clampf(10.0 * delta, 0.0, 1.0))
+
+	# 달릴 때 발밑 흙먼지(접지감)
+	_dust_t = maxf(0.0, _dust_t - delta)
+	if is_on_floor() and Vector2(velocity.x, velocity.z).length() > 2.0 and _dust_t <= 0.0:
+		_dust_t = 0.26
+		GameState.spawn_puff(global_position - Vector3(0, 0.45, 0), Color(0.72, 0.66, 0.5), 4)
 
 
 ## 행동 원샷 애니메이션 재생. 끝날 때까지 이동 애니가 덮어쓰지 않도록 잠금.

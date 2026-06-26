@@ -75,6 +75,16 @@ func _ready() -> void:
 	_build_visual()
 	_player = get_tree().get_first_node_in_group("player")
 	_pick_wander_target()
+	_spawn_in()
+
+
+## 등장 연출: 작게 솟아오르며 흙먼지 퍼프
+func _spawn_in() -> void:
+	if _mesh:
+		_mesh.scale = Vector3(0.3, 0.3, 0.3)
+		var tw := create_tween()
+		tw.tween_property(_mesh, "scale", Vector3.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	GameState.spawn_puff(global_position, _base_color, 9)
 
 
 func _build_visual() -> void:

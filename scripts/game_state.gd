@@ -128,11 +128,22 @@ func add_xp(amount: float) -> void:
 	# 런 단위 퍽 + 영구 메타(현자의 피) 경험치 보너스
 	amount *= (1.0 + perk_sum("xp_gain") + MetaManager.meta_sum("xp_gain"))
 	xp += amount
+	var leveled := false
 	while xp >= xp_to_next:
 		xp -= xp_to_next
 		level += 1
 		xp_to_next = roundf(xp_to_next * 1.3 + 6.0)
 		level_up.emit(level)
+		leveled = true
+	# 레벨업 축하 버스트(플레이어 발치에 금빛 링 + 스파크 + 텍스트)
+	if leveled:
+		var pl := get_tree().get_first_node_in_group("player")
+		if pl:
+			var p: Vector3 = pl.global_position
+			spawn_ring(p, Color(1.0, 0.85, 0.3), 3.6, 0.5, 0.15)
+			spawn_spark(p, Color(1.0, 0.9, 0.45), 22)
+			spawn_text(p, "LEVEL UP!", Color(1.0, 0.9, 0.35), 1.4)
+			shake(0.15)
 	xp_changed.emit(xp, xp_to_next, level)
 
 

@@ -94,9 +94,11 @@ var _levelup_title: Label
 var _levelup_choices: VBoxContainer
 var _pending_levels: int = 0
 var _levelup_showing: bool = false
-# === 저체력 적색 비네트 ===
+# === 저체력 적색 비네트 + 피격 플래시 ===
 var _vignette: ColorRect
 var _vignette_target: float = 0.0
+var _hurt_flash: ColorRect
+var _prev_health: float = -1.0
 # === 가독성: 야간 습격 경고 ===
 var _raid_label: Label
 # === 연속 처치 콤보 ===
@@ -477,6 +479,24 @@ void fragment() {
 	add_child(_vignette)
 	move_child(_vignette, 0)  # 게임 위, 다른 HUD 아래
 
+	# 피격 순간 적색 플래시(짧고 강하게)
+	_hurt_flash = ColorRect.new()
+	_hurt_flash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_hurt_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hurt_flash.color = Color(0.85, 0.08, 0.08)
+	_hurt_flash.modulate.a = 0.0
+	add_child(_hurt_flash)
+	move_child(_hurt_flash, 1)
+
+
+## 피격 시 화면을 잠깐 붉게 번쩍
+func _flash_hurt() -> void:
+	if _hurt_flash == null:
+		return
+	_hurt_flash.modulate.a = 0.34
+	var tw := create_tween()
+	tw.tween_property(_hurt_flash, "modulate:a", 0.0, 0.32).set_trans(Tween.TRANS_SINE)
+
 
 func _on_stat_changed(key: String, value: float, max_value: float) -> void:
 	if _bars.has(key):
@@ -490,10 +510,13 @@ func _on_stat_changed(key: String, value: float, max_value: float) -> void:
 			AudioManager.play("player_hurt")
 		elif ratio >= 0.35:
 			_warned[key] = false
-	# 체력 비네트: 40% 이하부터 진해짐(최대 0.6)
+	# 체력 비네트(40% 이하 진해짐) + 피해를 받으면 적색 플래시
 	if key == "health" and max_value > 0.0:
 		var hr: float = value / max_value
 		_vignette_target = clampf((0.4 - hr) / 0.4, 0.0, 1.0) * 0.6
+		if _prev_health >= 0.0 and value < _prev_health - 0.5:
+			_flash_hurt()
+		_prev_health = value
 
 
 func _on_time_changed(time_of_day: float, day: int) -> void:
