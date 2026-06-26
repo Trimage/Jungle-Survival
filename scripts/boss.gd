@@ -41,6 +41,10 @@ var _pivot: Node3D
 var _mat: StandardMaterial3D
 var _anim: AnimationPlayer = null
 var _walk_anim: String = ""
+var _melee_anim: String = ""
+var _heavy_anim: String = ""
+var _cast_anim: String = ""
+var _action_anim_t: float = 0.0   # >0 동안 공격 모션 재생 중
 var _base_color: Color = Color.WHITE
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 
@@ -95,6 +99,9 @@ func _build_visual() -> void:
 	_mat = LowpolyFactory.last_material  # 본체 머티리얼(플래시/광폭화 틴트용, 모델이면 null)
 	_anim = LowpolyFactory.find_anim_player(visual)
 	_walk_anim = LowpolyFactory.pick_locomotion(_anim)
+	_melee_anim = LowpolyFactory.first_anim(_anim, ["1H_Melee_Attack_Stab", "1H_Melee_Attack_Chop", "Unarmed_Melee_Attack_Punch_A"])
+	_heavy_anim = LowpolyFactory.first_anim(_anim, ["2H_Melee_Attack_Spin", "2H_Melee_Attack_Slice", "1H_Melee_Attack_Slice_Horizontal"])
+	_cast_anim = LowpolyFactory.first_anim(_anim, ["Spellcast_Shoot", "1H_Ranged_Shoot", "Throw"])
 
 	var cs := CollisionShape3D.new()
 	var box := BoxShape3D.new()
@@ -113,7 +120,11 @@ func get_display_name() -> String:
 func _physics_process(delta: float) -> void:
 	_attack_cd = maxf(0.0, _attack_cd - delta)
 	_summon_cd = maxf(0.0, _summon_cd - delta)
-	LowpolyFactory.update_locomotion(_anim, _walk_anim, Vector2(velocity.x, velocity.z).length())
+	# 공격 모션 재생 중에는 이동 애니로 덮어쓰지 않음
+	if _action_anim_t > 0.0:
+		_action_anim_t -= delta
+	else:
+		LowpolyFactory.update_locomotion(_anim, _walk_anim, Vector2(velocity.x, velocity.z).length())
 
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
@@ -190,15 +201,18 @@ func _execute_attack(to_player: Vector3) -> void:
 	_clear_telegraph()
 	match _pending:
 		"spit":
+			_action_anim_t = LowpolyFactory.play_action(_anim, _cast_anim, 1.2)
 			_spit(to_player)
 			_recover = 0.4
 			_state = State.SPIT
 		"lunge":
+			_action_anim_t = LowpolyFactory.play_action(_anim, _melee_anim, 1.3)
 			_lunge_dir = to_player.normalized()
 			_lunge_time = lunge_duration
 			_hit_done = false
 			_state = State.LUNGE
 		_:
+			_action_anim_t = LowpolyFactory.play_action(_anim, _heavy_anim, 1.2)
 			_do_sweep()
 			_recover = 0.5
 			_state = State.SWEEP

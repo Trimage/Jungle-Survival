@@ -47,6 +47,9 @@ var _mat: StandardMaterial3D
 var _base_color: Color = Color.WHITE
 var _anim: AnimationPlayer = null
 var _walk_anim: String = ""
+var _melee_anim: String = ""
+var _ranged_anim: String = ""
+var _action_anim_t: float = 0.0   # >0 동안 공격 모션 재생 중 → 이동 애니 보류
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 
 
@@ -95,6 +98,8 @@ func _build_visual() -> void:
 	add_child(LowpolyFactory.make_blob_shadow(maxf(sz.x, sz.z) * 0.55))  # 발밑 그림자
 	_anim = LowpolyFactory.find_anim_player(built)
 	_walk_anim = LowpolyFactory.pick_locomotion(_anim)
+	_melee_anim = LowpolyFactory.first_anim(_anim, ["1H_Melee_Attack_Chop", "1H_Melee_Attack_Slice_Diagonal", "Unarmed_Melee_Attack_Punch_A"])
+	_ranged_anim = LowpolyFactory.first_anim(_anim, ["1H_Ranged_Shoot", "Spellcast_Shoot", "Throw"])
 
 	var cs := CollisionShape3D.new()
 	var box := BoxShape3D.new()
@@ -115,7 +120,11 @@ func _physics_process(delta: float) -> void:
 		_slow_time -= delta
 		if _slow_time <= 0.0:
 			_slow_factor = 1.0
-	LowpolyFactory.update_locomotion(_anim, _walk_anim, Vector2(velocity.x, velocity.z).length())
+	# 공격 모션 재생 중에는 이동 애니로 덮어쓰지 않음
+	if _action_anim_t > 0.0:
+		_action_anim_t -= delta
+	else:
+		LowpolyFactory.update_locomotion(_anim, _walk_anim, Vector2(velocity.x, velocity.z).length())
 
 	# 중력
 	if not is_on_floor():
@@ -186,8 +195,12 @@ func _physics_process(delta: float) -> void:
 				elif _attack_timer <= 0.0:
 					_windup = WINDUP_TIME
 					_attack_timer = _attack_cd
-					var s := create_tween()
-					s.tween_property(_mesh, "scale", Vector3(1.25, 1.25, 1.25), WINDUP_TIME * 0.8)
+					# 모델은 휘두르기 애니, 절차적 셰이프는 스케일 텔레그래프
+					if _melee_anim != "":
+						_action_anim_t = LowpolyFactory.play_action(_anim, _melee_anim, 1.4)
+					else:
+						var s := create_tween()
+						s.tween_property(_mesh, "scale", Vector3(1.25, 1.25, 1.25), WINDUP_TIME * 0.8)
 
 	velocity.x = move_dir.x * _speed * _slow_factor
 	velocity.z = move_dir.z * _speed * _slow_factor
@@ -216,6 +229,8 @@ func _ranged_behavior(delta: float, target: Node3D, to_target: Vector3, dist: fl
 
 
 func _shoot(dir: Vector3) -> void:
+	if _ranged_anim != "":
+		_action_anim_t = LowpolyFactory.play_action(_anim, _ranged_anim, 1.3)
 	var p: Node3D = ProjectileScene.instantiate()
 	get_parent().add_child(p)
 	p.global_position = global_position + Vector3(0, 1.0, 0) + dir * 1.0

@@ -429,6 +429,29 @@ static func play_loop(ap: AnimationPlayer, name: String) -> void:
 	ap.play(name)
 
 
+## 원샷 행동 애니를 재생하고(LOOP_NONE) 끝날 때까지의 잠금 지속시간(초)을 반환.
+## 호출 측은 그 값을 자신의 잠금 타이머에 넣고, 동안 update_locomotion 을 건너뛴다.
+static func play_action(ap: AnimationPlayer, anim_name: String, speed: float = 1.4) -> float:
+	if ap == null or anim_name == "" or not ap.has_animation(anim_name):
+		return 0.0
+	var a := ap.get_animation(anim_name)
+	if a:
+		a.loop_mode = Animation.LOOP_NONE
+	ap.play(anim_name)
+	ap.speed_scale = speed
+	return (a.length / speed) if a else 0.4
+
+
+## 후보 목록 중 모델에 실제로 존재하는 첫 애니 이름을 반환(없으면 "").
+static func first_anim(ap: AnimationPlayer, candidates: Array) -> String:
+	if ap == null:
+		return ""
+	for n in candidates:
+		if ap.has_animation(n):
+			return n
+	return ""
+
+
 ## 이동 속도에 따라 걷기/Idle 전환 + 걷기 애니 속도를 이동속도에 맞춤(슬라이딩 완화)
 static func update_locomotion(ap: AnimationPlayer, walk_anim: String, planar_speed: float) -> void:
 	if ap == null:

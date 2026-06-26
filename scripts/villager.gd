@@ -43,6 +43,10 @@ var _pivot: Node3D
 var _mat: StandardMaterial3D
 var _anim: AnimationPlayer = null
 var _walk_anim: String = ""
+var _chop_anim: String = ""       # 채집/수리 작업 모션
+var _attack_anim: String = ""     # 사냥 공격 모션
+var _interact_anim: String = ""   # 치유/요리 등 상호작용 모션
+var _action_anim_t: float = 0.0   # >0 동안 작업 모션 재생 중
 var _job_label: Label3D = null
 var _nav_agent: NavigationAgent3D = null
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
@@ -131,6 +135,9 @@ func _build_visual() -> void:
 		_mat = null
 		_anim = LowpolyFactory.find_anim_player(vis)
 		_walk_anim = LowpolyFactory.pick_locomotion(_anim)
+		_chop_anim = LowpolyFactory.first_anim(_anim, ["1H_Melee_Attack_Chop", "1H_Melee_Attack_Slice_Diagonal"])
+		_attack_anim = LowpolyFactory.first_anim(_anim, ["1H_Melee_Attack_Slice_Diagonal", "1H_Melee_Attack_Chop"])
+		_interact_anim = LowpolyFactory.first_anim(_anim, ["Interact", "Use_Item", "PickUp"])
 	else:
 		var body := MeshInstance3D.new()
 		var cap := CapsuleMesh.new()
@@ -312,7 +319,11 @@ func _physics_process(delta: float) -> void:
 	if move_dir.length() > 0.05:
 		var target_yaw := atan2(move_dir.x, move_dir.z)
 		_pivot.rotation.y = lerp_angle(_pivot.rotation.y, target_yaw, 0.25)
-	LowpolyFactory.update_locomotion(_anim, _walk_anim, Vector2(velocity.x, velocity.z).length())
+	# 작업 모션 재생 중에는 이동 애니로 덮어쓰지 않음
+	if _action_anim_t > 0.0:
+		_action_anim_t -= delta
+	else:
+		LowpolyFactory.update_locomotion(_anim, _walk_anim, Vector2(velocity.x, velocity.z).length())
 
 
 ## 목표로 가는 방향(내비메시 길찾기로 건물을 돌아감). 내비 미준비/도달 시 직선/정지.
@@ -352,6 +363,7 @@ func _do_gather(delta: float) -> Vector3:
 		_gather_timer -= delta
 		if _gather_timer <= 0.0:
 			_gather_timer = _gather_interval
+			_action_anim_t = LowpolyFactory.play_action(_anim, _chop_anim, 1.5)
 			if _inventory:
 				_target_node.harvest(_inventory)
 		return Vector3.ZERO
@@ -368,6 +380,7 @@ func _do_hunt(delta: float) -> Vector3:
 		return _nav_to(target.global_position)
 	else:
 		if _atk_timer <= 0.0 and target.has_method("take_damage"):
+			_action_anim_t = LowpolyFactory.play_action(_anim, _attack_anim, 1.6)
 			target.take_damage(_atk_damage * (1.0 + GameState.perk_sum("villager_dmg")), global_position)
 			_atk_timer = _atk_cd
 			AudioManager.play("attack")
@@ -403,6 +416,7 @@ func _do_herbalist(delta: float) -> Vector3:
 	_heal_timer -= delta
 	if _heal_timer <= 0.0 and d <= _heal_range:
 		_heal_timer = _heal_interval
+		_action_anim_t = LowpolyFactory.play_action(_anim, _interact_anim, 1.2)
 		var st: Node = p.get_node_or_null("Stats")
 		if st:
 			st.modify("health", _heal)
@@ -432,6 +446,7 @@ func _do_rally(delta: float) -> Vector3:
 		var e: Node3D = _find_nearest_enemy()
 		if e and global_position.distance_to(e.global_position) <= _atk_range:
 			if _atk_timer <= 0.0 and e.has_method("take_damage"):
+				_action_anim_t = LowpolyFactory.play_action(_anim, _attack_anim, 1.6)
 				e.take_damage(_atk_damage * (1.0 + GameState.perk_sum("villager_dmg")), global_position)
 				_atk_timer = _atk_cd
 				AudioManager.play("attack")
@@ -456,6 +471,7 @@ func _do_mechanic(delta: float) -> Vector3:
 		_gather_timer -= delta
 		if _gather_timer <= 0.0:
 			_gather_timer = _gather_interval
+			_action_anim_t = LowpolyFactory.play_action(_anim, _chop_anim, 1.5)
 			b.repair(10.0)
 		return Vector3.ZERO
 
