@@ -27,6 +27,8 @@ func _ready() -> void:
 	_decorate()
 	# 길찾기 내비게이션(부락민이 건물을 돌아서 이동)
 	_setup_nav.call_deferred()
+	# 분위기 파티클(낮 꽃가루 / 밤 반딧불이)
+	_setup_ambient.call_deferred()
 
 
 func _mat(c: Color) -> StandardMaterial3D:
@@ -105,6 +107,56 @@ func _do_rebake() -> void:
 	_rebake_pending = false
 	if _nav and is_instance_valid(_nav):
 		_nav.bake_navigation_mesh()  # 스레드 비동기
+
+
+## === 분위기 파티클 (낮 꽃가루 / 밤 반딧불이) ===
+var _ambient_mat: StandardMaterial3D = null
+
+func _setup_ambient() -> void:
+	var p := CPUParticles3D.new()
+	var bm := BoxMesh.new()
+	bm.size = Vector3(0.09, 0.09, 0.09)
+	_ambient_mat = StandardMaterial3D.new()
+	_ambient_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_ambient_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_ambient_mat.albedo_color = Color(1.0, 0.96, 0.72, 0.45)
+	bm.material = _ambient_mat
+	p.mesh = bm
+	p.amount = 90
+	p.lifetime = 9.0
+	p.preprocess = 5.0
+	p.randomness = 0.8
+	p.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	p.emission_box_extents = Vector3(28, 4, 28)
+	p.direction = Vector3(0.2, 1.0, 0.1)
+	p.spread = 50.0
+	p.gravity = Vector3(0, 0.15, 0)
+	p.initial_velocity_min = 0.1
+	p.initial_velocity_max = 0.6
+	p.scale_amount_min = 0.5
+	p.scale_amount_max = 1.3
+	p.position = Vector3(0, 3.5, 0)
+	add_child(p)
+	# 낮/밤 전환에 반응
+	var dn := get_tree().get_first_node_in_group("day_night")
+	if dn and dn.has_signal("phase_changed"):
+		dn.phase_changed.connect(_on_ambient_phase)
+		_on_ambient_phase(dn.is_night() if dn.has_method("is_night") else false)
+
+
+func _on_ambient_phase(is_night: bool) -> void:
+	if _ambient_mat == null:
+		return
+	if is_night:
+		# 반딧불이: 발광 노랑-초록
+		_ambient_mat.albedo_color = Color(0.7, 1.0, 0.5, 0.95)
+		_ambient_mat.emission_enabled = true
+		_ambient_mat.emission = Color(0.6, 1.0, 0.4)
+		_ambient_mat.emission_energy_multiplier = 2.2
+	else:
+		# 꽃가루/먼지: 옅은 따뜻함
+		_ambient_mat.albedo_color = Color(1.0, 0.96, 0.72, 0.45)
+		_ambient_mat.emission_enabled = false
 
 
 ## 외곽선 머티리얼

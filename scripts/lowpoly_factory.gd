@@ -27,6 +27,12 @@ static func build(size: Vector3, color: Color, model_path: String, ghost: bool, 
 			return _creature(size, color)
 		"segmented":
 			return _segmented(size, color)
+		"bush":
+			return _bush(size, color)
+		"crystal":
+			return _crystal(size, color)
+		"mound":
+			return _mound(size, color)
 		_:
 			return _box(size, color, ghost)
 
@@ -144,6 +150,66 @@ static func _segmented(size: Vector3, color: Color) -> Node3D:
 		if i == 0:
 			last_material = mi.material_override
 	return root
+
+
+## 덤불(약초/식량) — 낮은 잎 블롭 군집
+static func _bush(size: Vector3, color: Color) -> Node3D:
+	var root := Node3D.new()
+	var n := 3
+	for i in n:
+		var mi := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		var sc := lerpf(1.0, 0.62, float(i) / float(n))
+		bm.size = Vector3(size.x * 0.78 * sc, size.y * 0.6, size.z * 0.78 * sc)
+		mi.mesh = bm
+		var ang := TAU * float(i) / float(n)
+		mi.position = Vector3(cos(ang) * size.x * 0.2, size.y * 0.4 + i * size.y * 0.16, sin(ang) * size.z * 0.2)
+		mi.material_override = _mat(color.lightened(0.06 * i), false)
+		root.add_child(mi)
+		if i == 0:
+			last_material = mi.material_override
+	return root
+
+
+## 수정 광맥 — 발광하는 뾰족 결정 군집
+static func _crystal(size: Vector3, color: Color) -> Node3D:
+	var root := Node3D.new()
+	var n := 4
+	for i in n:
+		var mi := MeshInstance3D.new()
+		var cm := CylinderMesh.new()
+		cm.radial_segments = 5
+		cm.top_radius = 0.0
+		cm.bottom_radius = size.x * (0.2 - 0.03 * i)
+		var h := size.y * lerpf(1.0, 0.5, float(i) / float(n))
+		cm.height = h
+		mi.mesh = cm
+		var ang := TAU * float(i) / float(n) + randf() * 0.4
+		mi.position = Vector3(cos(ang) * size.x * 0.22, h * 0.5, sin(ang) * size.z * 0.22)
+		mi.rotation = Vector3(randf_range(-0.22, 0.22), ang, randf_range(-0.22, 0.22))
+		var m := _mat(color, false)
+		m.emission_enabled = true
+		m.emission = color
+		m.emission_energy_multiplier = 1.3
+		mi.material_override = m
+		root.add_child(mi)
+		if i == 0:
+			last_material = m
+	return root
+
+
+## 낮은 둔덕(점토밭 등) — 납작한 돔
+static func _mound(size: Vector3, color: Color) -> Node3D:
+	var mi := MeshInstance3D.new()
+	var sm := SphereMesh.new()
+	sm.radius = size.x * 0.62
+	sm.height = size.x * 1.24
+	mi.mesh = sm
+	mi.scale = Vector3(1.0, 0.45, 1.0)
+	mi.position.y = size.x * 0.12
+	mi.material_override = _mat(color, false)
+	last_material = mi.material_override
+	return mi
 
 
 ## 외부 모델을 슬롯 크기(size)에 맞게 균일 스케일하고, 바닥이 y=0 에 닿도록 정렬
