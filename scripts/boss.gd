@@ -298,11 +298,15 @@ func _enrage() -> void:
 
 
 func _flash() -> void:
-	if _mat == null:
-		return
-	_mat.albedo_color = Color(1, 1, 1)
-	var tw := create_tween()
-	tw.tween_property(_mat, "albedo_color", _base_color, 0.25)
+	if _mat:
+		_mat.albedo_color = Color(1, 1, 1)
+		var tw := create_tween()
+		tw.tween_property(_mat, "albedo_color", _base_color, 0.25)
+	# 거대 보스라 살짝만 움찔(텔레그래프 펄스 중이 아닐 때만 의미 있음)
+	if _pivot and _hp > 0.0 and _state != State.TELEGRAPH:
+		_pivot.scale = Vector3(1.12, 0.9, 1.12)
+		var pt := create_tween()
+		pt.tween_property(_pivot, "scale", Vector3.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func _die() -> void:

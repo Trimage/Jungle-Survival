@@ -443,12 +443,19 @@ func attack() -> void:
 		if to.length() <= attack_reach and fwd.dot(to.normalized()) > 0.25:
 			e.take_damage(dmg, global_position, is_crit)
 			hit_any = true
-	# 적중 후 처리: 치명타 타격감 + 흡혈 퍽
+	# 적중 후 처리: 타격감(일반/치명타) + 흡혈 퍽
 	if hit_any:
 		if is_crit:
-			GameState.hitstop(0.06)
-			GameState.shake(0.28)
-			GameState.vibrate(40)
+			GameState.hitstop(0.08)
+			GameState.shake(0.32)
+			GameState.vibrate(50)
+			# 치명타 충격파 링
+			GameState.spawn_ring(global_position + get_facing() * 1.2, Color(1.0, 0.8, 0.25), 3.4, 0.26)
+		else:
+			# 일반 명중에도 미세한 타격감
+			GameState.hitstop(0.03)
+			GameState.shake(0.12)
+			GameState.vibrate(18)
 		var ls: float = GameState.perk_sum("lifesteal")
 		if ls > 0.0:
 			_stats.modify("health", ls)

@@ -46,6 +46,8 @@ var _is_bed: bool = false
 const AURA_INTERVAL := 0.5
 const SUPPORT_INTERVAL := 1.0
 
+var _pulse_count: int = 0   # 오라/지원 활성 링 펄스 카운터
+
 
 func _ready() -> void:
 	_def = ItemDB.building_def(build_type)
@@ -150,6 +152,12 @@ func _process(delta: float) -> void:
 			var p := get_tree().get_first_node_in_group("player")
 			if p and p.has_method("get_inventory"):
 				p.get_inventory().add_item(_produce_item, 1)
+				# 생산 연출: +아이템 팝업 + 살짝 통통
+				GameState.spawn_text(global_position, "+" + ItemDB.item_name(_produce_item), ItemDB.item_color(_produce_item), 0.7)
+				if _mesh:
+					var bt := create_tween()
+					bt.tween_property(_mesh, "position:y", 0.16, 0.12).set_trans(Tween.TRANS_SINE)
+					bt.tween_property(_mesh, "position:y", 0.0, 0.2).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 
 	# 화살탑: 사거리 내 최근접 적에게 자동 사격
 	if _turret:
@@ -170,6 +178,10 @@ func _process(delta: float) -> void:
 	_aura_timer -= delta
 	if _aura_timer <= 0.0:
 		_aura_timer = AURA_INTERVAL
+		# 활성 펄스: 2초마다 안전지대 경계를 보여주는 주황 링
+		_pulse_count += 1
+		if _pulse_count % 4 == 0:
+			GameState.spawn_ring(global_position, Color(1.0, 0.45, 0.15), _aura_radius / 0.8, 0.55, 0.15)
 		for e in get_tree().get_nodes_in_group("enemy"):
 			if e.is_in_group("boss"):
 				continue
@@ -191,15 +203,29 @@ func _fire_turret() -> void:
 	_turret_timer = _turret_cd
 	var dir: Vector3 = best.global_position - global_position
 	dir.y = 0.0
+	var ndir := dir.normalized()
 	var arrow: Node3D = TurretArrowScene.instantiate()
-	arrow.setup(dir.normalized(), 24.0, _turret_damage, false)
+	arrow.setup(ndir, 24.0, _turret_damage, false)
 	get_parent().add_child(arrow)
-	arrow.global_position = global_position + Vector3(0, 1.4, 0) + dir.normalized() * 0.8
+	var muzzle: Vector3 = global_position + Vector3(0, 1.4, 0) + ndir * 0.8
+	arrow.global_position = muzzle
 	AudioManager.play("attack")
+	# 발사 연출: 머즐 플래시 + 반동(살짝 뒤로 밀렸다 복귀)
+	GameState.spawn_spark(muzzle - Vector3(0, 1.0, 0), Color(1.0, 0.85, 0.4), 5)
+	if _mesh:
+		var tw := create_tween()
+		tw.tween_property(_mesh, "position", -ndir * 0.14, 0.05)
+		tw.tween_property(_mesh, "position", Vector3.ZERO, 0.13).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 ## 토템/의무막사: 주변 플레이어 버프 + 아군 치유
 func _do_support() -> void:
+	# 활성 펄스: 2초마다 지원 범위 링(버프=금색, 치유=초록)
+	_pulse_count += 1
+	if _pulse_count % 2 == 0:
+		var col: Color = Color(0.95, 0.8, 0.3) if _buff_aura else Color(0.4, 0.95, 0.5)
+		var rad: float = _buff_radius if _buff_aura else _heal_radius
+		GameState.spawn_ring(global_position, col, rad / 0.8, 0.6, 0.15)
 	var p := get_tree().get_first_node_in_group("player")
 	if p and global_position.distance_to(p.global_position) <= (_buff_radius if _buff_aura else _heal_radius):
 		if _buff_aura and p.has_method("apply_buff"):

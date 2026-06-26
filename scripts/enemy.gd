@@ -342,11 +342,15 @@ func take_damage(dmg: float, from_pos: Vector3, crit: bool = false) -> void:
 
 
 func _flash() -> void:
-	if _mat == null:
-		return
-	_mat.albedo_color = Color(1, 1, 1)
-	var tw := create_tween()
-	tw.tween_property(_mat, "albedo_color", _base_color, 0.25)
+	# 색 플래시(모델은 _mat 없음) + 스케일 펀치(움찔) — 타격감
+	if _mat:
+		_mat.albedo_color = Color(1, 1, 1)
+		var tw := create_tween()
+		tw.tween_property(_mat, "albedo_color", _base_color, 0.25)
+	if _mesh and _hp > 0.0:
+		_mesh.scale = Vector3(1.22, 0.82, 1.22)
+		var pt := create_tween()
+		pt.tween_property(_mesh, "scale", Vector3.ONE, 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func _die() -> void:

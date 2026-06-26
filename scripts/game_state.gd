@@ -446,6 +446,33 @@ func spawn_slash(pos: Vector3) -> void:
 	tw.tween_callback(mi.queue_free)
 
 
+## 범용 확장 링(바닥에 퍼지는 발광 링) — 치명타 충격파·오라 펄스·머즐 등에 재사용
+func spawn_ring(pos: Vector3, color: Color, to_scale: float = 2.6, dur: float = 0.22, y: float = 0.25) -> void:
+	var scene := get_tree().current_scene
+	if scene == null:
+		return
+	var mi := MeshInstance3D.new()
+	var tm := TorusMesh.new()
+	tm.inner_radius = 0.5
+	tm.outer_radius = 0.8
+	mi.mesh = tm
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.albedo_color = Color(color.r, color.g, color.b, 0.85)
+	mat.emission_enabled = true
+	mat.emission = color
+	mat.emission_energy_multiplier = 1.8
+	mi.material_override = mat
+	scene.add_child(mi)
+	mi.global_position = pos + Vector3(0, y, 0)
+	mi.scale = Vector3(0.4, 0.4, 0.4)
+	var tw := mi.create_tween()
+	tw.parallel().tween_property(mi, "scale", Vector3(to_scale, 1.0, to_scale), dur)
+	tw.parallel().tween_property(mat, "albedo_color:a", 0.0, dur)
+	tw.tween_callback(mi.queue_free)
+
+
 ## 플로팅 텍스트(데미지 숫자 등). scale 로 크기 강조(치명타 등).
 func spawn_text(pos: Vector3, text: String, color: Color, scale: float = 1.0) -> void:
 	var scene := get_tree().current_scene
