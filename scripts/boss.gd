@@ -248,8 +248,10 @@ func take_damage(dmg: float, _from_pos: Vector3, crit: bool = false) -> void:
 	_flash()
 	if crit:
 		GameState.spawn_text(global_position, "%d!" % int(dmg), Color(1.0, 0.8, 0.15), 1.8)
+		GameState.spawn_spark(global_position, Color(1.0, 0.8, 0.15), 18)
 	else:
 		GameState.spawn_text(global_position, str(int(dmg)), Color(1, 0.95, 0.6))
+		GameState.spawn_spark(global_position, Color(1, 1, 1), 10)
 	# 광폭화 진입
 	if not _enraged and _hp <= _max_hp * enrage_ratio:
 		_enrage()

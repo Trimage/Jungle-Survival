@@ -386,6 +386,66 @@ func spawn_puff(pos: Vector3, color: Color, amount: int = 12) -> void:
 	get_tree().create_timer(1.0).timeout.connect(p.queue_free)
 
 
+## 타격 스파크(날카로운 발광 줄기 버스트) — 적 피격 시
+func spawn_spark(pos: Vector3, color: Color = Color(1, 1, 1), amount: int = 10) -> void:
+	var scene := get_tree().current_scene
+	if scene == null:
+		return
+	var p := CPUParticles3D.new()
+	var bm := BoxMesh.new()
+	bm.size = Vector3(0.06, 0.06, 0.24)
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = color
+	mat.emission_enabled = true
+	mat.emission = color
+	mat.emission_energy_multiplier = 2.0
+	bm.material = mat
+	p.mesh = bm
+	p.one_shot = true
+	p.emitting = true
+	p.amount = amount
+	p.lifetime = 0.25
+	p.explosiveness = 1.0
+	p.direction = Vector3.UP
+	p.spread = 180.0
+	p.initial_velocity_min = 4.0
+	p.initial_velocity_max = 8.5
+	p.gravity = Vector3(0, -7, 0)
+	p.scale_amount_min = 0.6
+	p.scale_amount_max = 1.3
+	scene.add_child(p)
+	p.global_position = pos + Vector3(0, 1.0, 0)
+	get_tree().create_timer(0.6).timeout.connect(p.queue_free)
+
+
+## 베기 충격 링(바닥에 퍼지는 발광 링) — 근접 공격 시
+func spawn_slash(pos: Vector3) -> void:
+	var scene := get_tree().current_scene
+	if scene == null:
+		return
+	var mi := MeshInstance3D.new()
+	var tm := TorusMesh.new()
+	tm.inner_radius = 0.55
+	tm.outer_radius = 0.8
+	mi.mesh = tm
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.albedo_color = Color(0.8, 0.95, 1.0, 0.85)
+	mat.emission_enabled = true
+	mat.emission = Color(0.7, 0.9, 1.0)
+	mat.emission_energy_multiplier = 1.6
+	mi.material_override = mat
+	scene.add_child(mi)
+	mi.global_position = pos + Vector3(0, 0.3, 0)
+	mi.scale = Vector3(0.5, 0.5, 0.5)
+	var tw := mi.create_tween()
+	tw.parallel().tween_property(mi, "scale", Vector3(2.6, 1.0, 2.6), 0.2)
+	tw.parallel().tween_property(mat, "albedo_color:a", 0.0, 0.2)
+	tw.tween_callback(mi.queue_free)
+
+
 ## 플로팅 텍스트(데미지 숫자 등). scale 로 크기 강조(치명타 등).
 func spawn_text(pos: Vector3, text: String, color: Color, scale: float = 1.0) -> void:
 	var scene := get_tree().current_scene

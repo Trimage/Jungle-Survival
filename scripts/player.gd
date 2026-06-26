@@ -390,6 +390,7 @@ func attack() -> void:
 		# 탄약 없으면 약한 근접으로 폴백
 
 	_swing()
+	GameState.spawn_slash(global_position + get_facing() * 1.0)
 	AudioManager.play("attack")
 	var fwd := get_facing()
 	var is_crit := randf() < _crit_chance()

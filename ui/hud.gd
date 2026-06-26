@@ -245,7 +245,7 @@ func _ready() -> void:
 
 	# 퀘스트/연구 패널 + 도움말 패널에 진입 버튼
 	_build_quest_research_ui()
-	GameState.quest_completed.connect(func(qn, rw): _show_toast("🎯 목표 달성: %s (보상 %s)" % [qn, rw]); GameState.vibrate(80))
+	GameState.quest_completed.connect(func(qn, rw): _show_toast("🎯 목표 달성: %s (보상 %s)" % [qn, rw]); GameState.vibrate(80); AudioManager.play("craft"))
 	GameState.research_changed.connect(func(): _build_build_list(); _build_craft_list())
 
 
@@ -926,6 +926,7 @@ func _try_show_levelup() -> void:
 		_levelup_choices.add_child(_make_perk_button(id))
 	_levelup_overlay.visible = true
 	GameState.vibrate(120)
+	AudioManager.play("recruit")
 
 
 func _make_perk_button(id: String) -> Button:

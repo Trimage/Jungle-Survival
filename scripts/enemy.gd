@@ -306,8 +306,10 @@ func take_damage(dmg: float, from_pos: Vector3, crit: bool = false) -> void:
 	AudioManager.play("hit")
 	if crit:
 		GameState.spawn_text(global_position, "%d!" % int(dmg), Color(1.0, 0.85, 0.2), 1.7)
+		GameState.spawn_spark(global_position, Color(1.0, 0.85, 0.2), 16)
 	else:
 		GameState.spawn_text(global_position, str(int(dmg)), Color(1, 1, 1))
+		GameState.spawn_spark(global_position, Color(1, 1, 1), 9)
 	# 체력이 낮아져 길들이기 가능해지면 1회 안내
 	if not _tame_hinted and is_tameable():
 		_tame_hinted = true
