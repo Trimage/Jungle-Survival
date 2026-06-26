@@ -26,6 +26,7 @@ func _ready() -> void:
 	mi.position.y = 0.2
 	_mat = StandardMaterial3D.new()
 	_mat.albedo_color = _base_color
+	LowpolyFactory.apply_outline(_mat)
 	mi.material_override = _mat
 	add_child(mi)
 

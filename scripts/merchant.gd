@@ -11,37 +11,23 @@ func _ready() -> void:
 
 
 func _build_visual() -> void:
-	# 로브 입은 상인(파란 몸통 + 머리 + 등짐) — 마을 사람과 구별되는 색
-	var body := MeshInstance3D.new()
-	var cap := CapsuleMesh.new()
-	cap.radius = 0.4
-	cap.height = 1.5
-	body.mesh = cap
-	body.position.y = 0.75
-	var bm := StandardMaterial3D.new()
-	bm.albedo_color = Color(0.3, 0.45, 0.75)
-	body.material_override = bm
-	add_child(body)
-
-	var head := MeshInstance3D.new()
-	var hb := BoxMesh.new()
-	hb.size = Vector3(0.45, 0.45, 0.45)
-	head.mesh = hb
-	head.position.y = 1.6
-	var hm := StandardMaterial3D.new()
-	hm.albedo_color = Color(0.9, 0.78, 0.62)
-	head.material_override = hm
-	add_child(head)
-
-	var pack := MeshInstance3D.new()
-	var pb := BoxMesh.new()
-	pb.size = Vector3(0.7, 0.7, 0.45)
-	pack.mesh = pb
-	pack.position = Vector3(0, 1.0, -0.45)
-	var pm := StandardMaterial3D.new()
-	pm.albedo_color = Color(0.55, 0.38, 0.2)
-	pack.material_override = pm
-	add_child(pack)
+	# 후드 쓴 떠돌이 상인(KayKit 캐릭터) + 발밑 그림자
+	var model := "res://assets/models/kaykit/Rogue_Hooded.glb"
+	if ResourceLoader.exists(model):
+		var vis: Node3D = LowpolyFactory.build(Vector3(0.85, 1.7, 0.85), Color.WHITE, model, false)
+		add_child(vis)
+		add_child(LowpolyFactory.make_blob_shadow(0.45))
+	else:
+		var body := MeshInstance3D.new()
+		var cap := CapsuleMesh.new()
+		cap.radius = 0.4
+		cap.height = 1.5
+		body.mesh = cap
+		body.position.y = 0.75
+		var bm := StandardMaterial3D.new()
+		bm.albedo_color = Color(0.3, 0.45, 0.75)
+		body.material_override = bm
+		add_child(body)
 
 	# 머리 위 안내 표식
 	var sign := Label3D.new()

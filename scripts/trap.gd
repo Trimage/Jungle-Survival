@@ -54,6 +54,7 @@ func _build_visual() -> void:
 		mat.emission_enabled = true
 		mat.emission = Color(0.8, 0.2, 0.1)
 		mat.emission_energy_multiplier = 0.6
+	LowpolyFactory.apply_outline(mat)
 	mi.material_override = mat
 	add_child(mi)
 

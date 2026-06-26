@@ -14,14 +14,14 @@ signal died
 ## decay 가 양수면 감소(허기·수분), 음수면 증가(감염도). 0은 별도 로직 처리.
 const STAT_DEFS := {
 	"health":    {"name": "체력",    "icon": "♥", "color": Color(0.85, 0.27, 0.27), "max": 100.0, "start": 100.0, "decay": 0.0},
-	"hunger":    {"name": "허기",    "icon": "🍖", "color": Color(0.92, 0.57, 0.22), "max": 100.0, "start": 100.0, "decay": 0.8},
-	"thirst":    {"name": "수분",    "icon": "💧", "color": Color(0.32, 0.62, 0.9),  "max": 100.0, "start": 100.0, "decay": 1.1},
+	"hunger":    {"name": "허기",    "icon": "🍖", "color": Color(0.92, 0.57, 0.22), "max": 100.0, "start": 100.0, "decay": 0.5},
+	"thirst":    {"name": "수분",    "icon": "💧", "color": Color(0.32, 0.62, 0.9),  "max": 100.0, "start": 100.0, "decay": 0.65},
 	"stamina":   {"name": "스태미나", "icon": "⚡", "color": Color(0.42, 0.8, 0.45),  "max": 100.0, "start": 100.0, "decay": 0.0},
-	"infection": {"name": "감염도",  "icon": "☣", "color": Color(0.62, 0.36, 0.72), "max": 100.0, "start": 0.0,   "decay": -0.15},
+	"infection": {"name": "감염도",  "icon": "☣", "color": Color(0.62, 0.36, 0.72), "max": 100.0, "start": 0.0,   "decay": -0.1},
 }
 
 ## 허기/수분이 0일 때 초당 체력 감소
-@export var starve_damage: float = 2.0
+@export var starve_damage: float = 1.5
 ## 감염도가 이 값 이상이면 체력 감소 시작
 @export var infection_threshold: float = 80.0
 ## 감염 위험 시 초당 체력 감소
