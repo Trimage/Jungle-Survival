@@ -20,15 +20,22 @@ func _ready() -> void:
 	add_to_group("pickup")
 	var col := ItemDB.item_color(_id)
 	_mesh = MeshInstance3D.new()
-	var bm := BoxMesh.new()
-	bm.size = Vector3(0.4, 0.4, 0.4)
-	_mesh.mesh = bm
+	# 저폴리 발광 보석(원래 박스 → 깎인 보석)
+	var sm := SphereMesh.new()
+	sm.radius = 0.2
+	sm.height = 0.44
+	sm.radial_segments = 5
+	sm.rings = 4
+	_mesh.mesh = sm
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = col
 	mat.emission_enabled = true
-	mat.emission = col * 0.4
+	mat.emission = col
+	mat.emission_energy_multiplier = 0.9
+	LowpolyFactory.apply_outline(mat)
 	_mesh.material_override = mat
 	_mesh.position.y = 0.5
+	_mesh.rotation.x = 0.35  # 살짝 기울여 보석 느낌
 	add_child(_mesh)
 	# 솟아오르는 등장 연출
 	var tw := create_tween()

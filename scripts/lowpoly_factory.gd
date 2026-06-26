@@ -33,6 +33,10 @@ static func build(size: Vector3, color: Color, model_path: String, ghost: bool, 
 			return _crystal(size, color)
 		"mound":
 			return _mound(size, color)
+		"spikes":
+			return _spikes(size, color)
+		"bonfire":
+			return _bonfire(size, color)
 		_:
 			return _box(size, color, ghost)
 
@@ -195,6 +199,70 @@ static func _crystal(size: Vector3, color: Color) -> Node3D:
 		root.add_child(mi)
 		if i == 0:
 			last_material = m
+	return root
+
+
+## 모닥불/큰 화톳불 — 교차한 통나무 + 발광 불꽃
+static func _bonfire(size: Vector3, color: Color) -> Node3D:
+	var root := Node3D.new()
+	var logs := 4
+	for i in logs:
+		var mi := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(size.x * 0.92, size.y * 0.22, size.z * 0.22)
+		mi.mesh = bm
+		mi.rotation.y = PI * float(i) / float(logs)
+		mi.position.y = size.y * 0.14
+		mi.material_override = _mat(Color(0.42, 0.3, 0.18).darkened(0.04 * i), false)
+		root.add_child(mi)
+	last_material = null
+	var flames := 3
+	for i in flames:
+		var f := MeshInstance3D.new()
+		var fc := CylinderMesh.new()
+		fc.top_radius = 0.0
+		fc.bottom_radius = size.x * (0.24 - 0.05 * i)
+		fc.height = size.y * (0.8 + 0.35 * i)
+		fc.radial_segments = 6
+		f.mesh = fc
+		f.position = Vector3((randf() - 0.5) * size.x * 0.18, size.y * 0.3 + i * size.y * 0.12, (randf() - 0.5) * size.z * 0.18)
+		var fm := _mat(Color(1.0, 0.55 - 0.13 * i, 0.12).lerp(Color(1.0, 0.9, 0.3), 0.28 * i), false)
+		fm.emission_enabled = true
+		fm.emission = Color(1.0, 0.55, 0.16)
+		fm.emission_energy_multiplier = 2.6
+		f.material_override = fm
+		root.add_child(f)
+		if i == 0:
+			last_material = fm
+	return root
+
+
+## 가시 덫 — 바닥판 + 위로 솟은 금속 가시들
+static func _spikes(size: Vector3, color: Color) -> Node3D:
+	var root := Node3D.new()
+	var base := MeshInstance3D.new()
+	var bm := BoxMesh.new()
+	bm.size = Vector3(size.x, maxf(size.y, 0.18), size.z)
+	base.mesh = bm
+	base.position.y = maxf(size.y, 0.18) * 0.5
+	base.material_override = _mat(color.darkened(0.2), false)
+	root.add_child(base)
+	last_material = base.material_override
+	var spike_h := size.x * 0.45
+	var n := 6
+	for i in n:
+		var sp := MeshInstance3D.new()
+		var cm := CylinderMesh.new()
+		cm.top_radius = 0.0
+		cm.bottom_radius = size.x * 0.11
+		cm.height = spike_h
+		cm.radial_segments = 5
+		sp.mesh = cm
+		var ang := randf() * TAU
+		var r := randf() * size.x * 0.34
+		sp.position = Vector3(cos(ang) * r, maxf(size.y, 0.18) + spike_h * 0.5, sin(ang) * r)
+		sp.material_override = _mat(Color(0.72, 0.73, 0.76), false)
+		root.add_child(sp)
 	return root
 
 
