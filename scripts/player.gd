@@ -36,6 +36,17 @@ const MAX_PETS := 3
 ## 플레이어 캐릭터 모델(.glb). 없으면 기본 캡슐 사용.
 const PLAYER_MODEL := "res://assets/models/kaykit/Knight.glb"
 
+# 행동별 원샷 애니메이션(KayKit Adventurers 클립명)
+const ANIM_MELEE := "1H_Melee_Attack_Slice_Horizontal"
+const ANIM_RANGED := "1H_Ranged_Shoot"
+const ANIM_THROW := "Throw"
+const ANIM_GATHER := "1H_Melee_Attack_Chop"
+const ANIM_INTERACT := "Interact"
+const ANIM_DODGE := "Dodge_Forward"
+const ANIM_HIT := "Hit_A"
+const ANIM_DEATH := "Death_A"
+const ANIM_USE := "Use_Item"
+
 signal harvested(node_name: String, yields: Dictionary)
 signal player_died
 signal player_respawned
@@ -79,6 +90,8 @@ var _shield_t: float = 0.0           # >0 동안 피해 무효(철갑 물약)
 var _walk_t: float = 0.0
 var _anim: AnimationPlayer = null
 var _walk_anim: String = ""
+## >0 인 동안 행동 원샷 애니 재생 중 → 이동 애니로 덮어쓰지 않음
+var _action_anim_t: float = 0.0
 
 
 func _ready() -> void:
@@ -178,8 +191,10 @@ func _physics_process(delta: float) -> void:
 	if dir.length() > 0.01:
 		var target_yaw := atan2(dir.x, dir.z)
 		_mesh_pivot.rotation.y = lerp_angle(_mesh_pivot.rotation.y, target_yaw, turn_speed * delta)
-	# 이동 모션: 모델 애니(있으면 걷기/달리기) 또는 캡슐 폴백 바운스
-	if _anim != null:
+	# 이동 모션: 행동 원샷 애니 재생 중에는 덮어쓰지 않음
+	if _action_anim_t > 0.0:
+		_action_anim_t -= delta
+	elif _anim != null:
 		LowpolyFactory.update_locomotion(_anim, _walk_anim, Vector2(velocity.x, velocity.z).length())
 	elif dir.length() > 0.01:
 		_walk_t += delta * 12.0
@@ -188,21 +203,39 @@ func _physics_process(delta: float) -> void:
 		_mesh_pivot.position.y = lerpf(_mesh_pivot.position.y, 0.0, clampf(10.0 * delta, 0.0, 1.0))
 
 
-## === 행동 버튼: 영입 > 채집 > 공격 ===
+## 행동 원샷 애니메이션 재생. 끝날 때까지 이동 애니가 덮어쓰지 않도록 잠금.
+func _play_action(anim_name: String, speed: float = 1.5) -> void:
+	if _anim == null or not _anim.has_animation(anim_name):
+		return
+	var a := _anim.get_animation(anim_name)
+	if a:
+		a.loop_mode = Animation.LOOP_NONE
+	_anim.play(anim_name)
+	_anim.speed_scale = speed
+	_action_anim_t = (a.length / speed) if a else 0.4
+
+
+## === 행동 버튼: 영입 > 채집 > 공격 (각 동작에 맞는 모션 재생) ===
 func action() -> void:
 	if _dead:
 		return
 	if _try_recruit():
+		_play_action(ANIM_INTERACT, 1.3)
 		return
 	if _try_open_chest():
+		_play_action(ANIM_INTERACT, 1.3)
 		return
 	if _try_toggle_gate():
+		_play_action(ANIM_INTERACT, 1.3)
 		return
 	if _try_talk_merchant():
+		_play_action(ANIM_INTERACT, 1.3)
 		return
 	if _try_harvest():
+		_play_action(ANIM_GATHER, 1.6)
 		return
 	if _try_tame():
+		_play_action(ANIM_INTERACT, 1.3)
 		return
 	attack()
 
@@ -385,12 +418,17 @@ func attack() -> void:
 		var ammo: String = _weapon_def.get("ammo", "arrow")
 		if _inventory.count_of(ammo) > 0:
 			_inventory.remove_item(ammo, 1)
+			_play_action(ANIM_RANGED, 1.5)
 			_fire_arrow()
 			AudioManager.play("attack")
 			return
 		# 탄약 없으면 약한 근접으로 폴백
 
-	_swing()
+	# 모델 애니가 있으면 검 휘두르기 모션, 없으면 캡슐 찌르기 폴백
+	if _anim != null and _anim.has_animation(ANIM_MELEE):
+		_play_action(ANIM_MELEE, 1.7)
+	else:
+		_swing()
 	GameState.spawn_slash(global_position + get_facing() * 1.0)
 	AudioManager.play("attack")
 	var fwd := get_facing()
@@ -466,6 +504,7 @@ func throw_item(_id: String, throw_def: Dictionary) -> void:
 	if scene == null:
 		return
 	var dir := get_facing()
+	_play_action(ANIM_THROW, 1.4)
 	var rng: float = float(throw_def.get("range", 6.0))
 	var ttype: String = throw_def.get("type", "explosive")
 	if ttype == "bait":
@@ -539,6 +578,7 @@ func dodge() -> void:
 	_dash_vel = _last_dir * dodge_speed
 	_dash_time = dodge_time
 	_invuln_time = dodge_time + 0.05
+	_play_action(ANIM_DODGE, 1.6)  # 구르기 모션
 
 
 ## === 피격 ===
@@ -553,6 +593,8 @@ func take_damage(dmg: float, from_pos: Vector3) -> void:
 	var reduction: float = clampf(_armor_reduction + GameState.perk_sum("armor"), 0.0, 0.85)
 	var taken: float = dmg * (1.0 - reduction)
 	_stats.modify("health", -taken)
+	if not _dead:
+		_play_action(ANIM_HIT, 1.6)  # 피격 움찔(사망 시엔 사망 모션 우선)
 	AudioManager.play("player_hurt")
 	GameState.spawn_text(global_position, str(int(taken)), Color(1, 0.4, 0.4))
 	GameState.shake(0.18)
@@ -576,6 +618,7 @@ func _hurt_flash() -> void:
 
 func _on_stats_died() -> void:
 	_dead = true
+	_play_action(ANIM_DEATH, 1.0)  # 쓰러지는 모션
 	player_died.emit()
 
 
@@ -585,6 +628,7 @@ func respawn() -> void:
 	velocity = Vector3.ZERO
 	_dash_time = 0.0
 	_invuln_time = 0.0
+	_action_anim_t = 0.0  # 사망 모션 잠금 해제 → 이동 애니 복귀
 	_stats.revive()
 	_dead = false
 	player_respawned.emit()
@@ -638,6 +682,7 @@ func apply_meta_start() -> void:
 func consume_item(_id: String, effects: Dictionary) -> void:
 	for key in effects:
 		_stats.modify(key, float(effects[key]))
+	_play_action(ANIM_USE, 1.3)  # 아이템 사용 모션
 	AudioManager.play("harvest")
 
 
