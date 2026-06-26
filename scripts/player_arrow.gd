@@ -28,6 +28,7 @@ func _ready() -> void:
 	mat.albedo_color = Color(0.95, 0.92, 0.6)
 	mat.emission_enabled = true
 	mat.emission = Color(0.8, 0.7, 0.3)
+	LowpolyFactory.apply_outline(mat)
 	mi.material_override = mat
 	if _dir.length() > 0.01:
 		mi.look_at_from_position(Vector3.ZERO, _dir, Vector3.UP)

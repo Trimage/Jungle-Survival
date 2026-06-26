@@ -29,6 +29,7 @@ func _ready() -> void:
 	mat.albedo_color = Color(0.5, 0.85, 0.3)
 	mat.emission_enabled = true
 	mat.emission = Color(0.4, 0.8, 0.2)
+	LowpolyFactory.apply_outline(mat)
 	mi.material_override = mat
 	add_child(mi)
 

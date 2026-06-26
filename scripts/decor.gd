@@ -5,6 +5,13 @@ extends Node3D
 @export var count: int = 48
 @export var area: float = 28.0
 
+const ROCKS := [
+	"res://assets/models/hexagon/nature/rock_single_A.gltf",
+	"res://assets/models/hexagon/nature/rock_single_B.gltf",
+	"res://assets/models/hexagon/nature/rock_single_C.gltf",
+	"res://assets/models/hexagon/nature/rock_single_D.gltf",
+]
+
 
 func _ready() -> void:
 	for i in count:
@@ -26,10 +33,12 @@ func _rand_pos() -> Vector3:
 	return Vector3(area, 0, area)
 
 
-func _mat(c: Color) -> StandardMaterial3D:
+func _mat(c: Color, outline: bool = false) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.albedo_color = c
 	m.roughness = 1.0
+	if outline:
+		LowpolyFactory.apply_outline(m)
 	return m
 
 
@@ -58,7 +67,7 @@ func _flower(pos: Vector3) -> void:
 	sm.size = Vector3(0.08, 0.45, 0.08)
 	stem.mesh = sm
 	stem.position.y = 0.225
-	stem.material_override = _mat(Color(0.3, 0.5, 0.25))
+	stem.material_override = _mat(Color(0.3, 0.5, 0.25), true)
 	node.add_child(stem)
 	var top := MeshInstance3D.new()
 	var tm := BoxMesh.new()
@@ -66,16 +75,15 @@ func _flower(pos: Vector3) -> void:
 	top.mesh = tm
 	top.position.y = 0.52
 	var colors := [Color(0.9, 0.4, 0.5), Color(0.95, 0.8, 0.3), Color(0.7, 0.5, 0.9), Color(0.95, 0.95, 0.95)]
-	top.material_override = _mat(colors[randi() % colors.size()])
+	top.material_override = _mat(colors[randi() % colors.size()], true)
 	node.add_child(top)
 
 
 func _pebble(pos: Vector3) -> void:
-	var mi := MeshInstance3D.new()
-	var bm := BoxMesh.new()
-	bm.size = Vector3(randf_range(0.4, 0.8), 0.25, randf_range(0.4, 0.8))
-	mi.mesh = bm
-	mi.position = pos + Vector3(0, 0.12, 0)
-	mi.rotation.y = randf() * TAU
-	mi.material_override = _mat(Color(0.55, 0.55, 0.57).lightened(randf() * 0.1))
-	add_child(mi)
+	# 납작한 박스 → 헥사곤 로우폴리 바위 모델(지형의 바위들과 톤 일치)
+	var path: String = ROCKS[randi() % ROCKS.size()]
+	var s := randf_range(0.35, 0.7)
+	var rock: Node3D = LowpolyFactory.build(Vector3(s, s, s), Color.WHITE, path, false)
+	rock.position = pos
+	rock.rotation.y = randf() * TAU
+	add_child(rock)
