@@ -8,6 +8,20 @@ const DECO_TREES := ["tree_single_A", "tree_single_B", "trees_A_large", "trees_A
 const DECO_ROCKS := ["rock_single_A", "rock_single_B", "rock_single_C", "rock_single_D"]
 const DECO_WATER := ["waterplant_A", "waterlily_A"]
 
+# 바람에 흔들리는 나무들: {node, phase, amp}
+var _tree_sway: Array = []
+var _wind_t: float = 0.0
+
+
+func _process(delta: float) -> void:
+	if _tree_sway.is_empty():
+		return
+	_wind_t += delta
+	for s in _tree_sway:
+		var n: Node3D = s["node"]
+		if is_instance_valid(n):
+			n.rotation.z = sin(_wind_t * 1.1 + s["phase"]) * s["amp"]
+
 
 func _ready() -> void:
 	_pond(Vector3(-16, 0, -13), 7.0)
@@ -29,6 +43,10 @@ func _ready() -> void:
 	_setup_nav.call_deferred()
 	# 분위기 파티클(낮 꽃가루 / 밤 반딧불이)
 	_setup_ambient.call_deferred()
+	# 간헐적 비 날씨
+	var weather := Node3D.new()
+	weather.set_script(load("res://scripts/weather.gd"))
+	add_child(weather)
 
 
 func _mat(c: Color) -> StandardMaterial3D:
@@ -237,7 +255,7 @@ func _decorate() -> void:
 	for _i in 20:
 		var a := randf() * TAU
 		var r := randf_range(11.0, 26.5)
-		_deco(DECO_TREES.pick_random(), Vector3(cos(a) * r, 0.0, sin(a) * r), randf_range(2.6, 3.8))
+		_deco(DECO_TREES.pick_random(), Vector3(cos(a) * r, 0.0, sin(a) * r), randf_range(2.6, 3.8), true)
 	for _j in 16:
 		var a2 := randf() * TAU
 		var r2 := randf_range(9.0, 27.0)
@@ -250,7 +268,8 @@ func _decorate() -> void:
 
 
 ## 자연 모델 1개 배치(높이에 맞춰 자동 스케일, 랜덤 회전, 비충돌)
-func _deco(model_name: String, pos: Vector3, height: float) -> void:
+## sway=true 면 바람에 흔들리도록 등록(나무).
+func _deco(model_name: String, pos: Vector3, height: float, sway: bool = false) -> void:
 	var path := NATURE + model_name + ".gltf"
 	if not ResourceLoader.exists(path):
 		return
@@ -258,6 +277,8 @@ func _deco(model_name: String, pos: Vector3, height: float) -> void:
 	add_child(vis)
 	vis.position = pos
 	vis.rotation.y = randf() * TAU
+	if sway:
+		_tree_sway.append({"node": vis, "phase": randf() * TAU, "amp": randf_range(0.02, 0.035)})
 
 
 # 부서진 기둥 1개(충돌 있는 StaticBody)

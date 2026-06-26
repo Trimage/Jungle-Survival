@@ -84,17 +84,24 @@ func open(_inv: Node) -> bool:
 	if _opened:
 		return false
 	_opened = true
+	var gold := Color(1.0, 0.86, 0.35)
 	GameState.spawn_drops(global_position, _loot)
-	GameState.spawn_puff(global_position, Color(1.0, 0.86, 0.35), 24)
-	GameState.spawn_text(global_position, "✨ 보물!", Color(1.0, 0.86, 0.35), 1.3)
-	GameState.shake(0.22)
-	GameState.vibrate(80)
+	GameState.spawn_puff(global_position, gold, 24)
+	GameState.spawn_text(global_position, "✨ 보물!", gold, 1.3)
+	# 황금 충격파 링 + 솟구치는 분수 스파크(보스 상자는 더 크게)
+	var boss: bool = _tier == "boss"
+	GameState.spawn_ring(global_position, gold, 3.2 if boss else 2.4, 0.5, 0.2)
+	GameState.spawn_spark(global_position, gold, 30 if boss else 18)
+	GameState.shake(0.3 if boss else 0.22)
+	GameState.vibrate(120 if boss else 80)
 	AudioManager.play("craft")
-	# 뚜껑 열림(절차적일 때만) 후 사라짐
+	# 상자가 폴짝 튀어오르며 뚜껑 열림(절차적) → 사라짐
 	var tw := create_tween()
+	if _box:
+		tw.tween_property(_box, "position:y", _box.position.y + 0.35, 0.12).set_trans(Tween.TRANS_BACK)
 	if _lid:
-		tw.tween_property(_lid, "rotation:x", -1.2, 0.18)
-		tw.tween_interval(0.1)
+		tw.parallel().tween_property(_lid, "rotation:x", -1.2, 0.18)
+	tw.tween_interval(0.1)
 	tw.tween_property(self, "scale", Vector3(1.1, 0.05, 1.1), 0.2)
 	tw.tween_callback(queue_free)
 	return true
