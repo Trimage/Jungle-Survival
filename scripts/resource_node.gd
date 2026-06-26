@@ -62,6 +62,9 @@ func harvest(inv: Node) -> Dictionary:
 		inv.add_item(id, int(yields[id]))
 	_uses -= 1
 	_punch()
+	# 채집 파편(자원 색의 조각/잎이 튐)
+	var col := Color.html(_def.get("color", "#888888"))
+	GameState.spawn_puff(global_position, col, 8)
 	if _uses <= 0:
 		_deplete()
 	return yields
@@ -77,10 +80,20 @@ func _punch() -> void:
 
 
 func _deplete() -> void:
-	visible = false
 	set_deferred("monitorable", false)
+	# 줄어들며 사라지는 고갈 연출
+	if _mesh:
+		var tw := create_tween()
+		tw.tween_property(_mesh, "scale", Vector3(0.05, 0.05, 0.05), 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+		await tw.finished
+	visible = false
 	if respawn_time > 0.0:
 		await get_tree().create_timer(respawn_time).timeout
 		_uses = int(_def.get("uses", 1))
 		visible = true
 		set_deferred("monitorable", true)
+		# 솟아오르며 재등장
+		if _mesh:
+			_mesh.scale = Vector3(0.05, 0.05, 0.05)
+			var rt := create_tween()
+			rt.tween_property(_mesh, "scale", Vector3.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)

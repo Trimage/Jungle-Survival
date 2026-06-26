@@ -99,6 +99,12 @@ func _place_building(pos: Vector3, free: bool = false) -> bool:
 	_get_world().add_child(b)
 	b.global_position = pos
 	AudioManager.play("build")
+	# 설치 연출: 바닥에서 솟아오르는 팝인 + 먼지
+	b.scale = Vector3(0.6, 0.1, 0.6)
+	var tw := b.create_tween()
+	tw.tween_property(b, "scale", Vector3.ONE, 0.32).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	GameState.spawn_ring(pos, Color(0.62, 0.52, 0.36), 2.2, 0.4, 0.08)
+	GameState.spawn_puff(pos, Color(0.6, 0.52, 0.4), 12)
 	if not free:
 		GameState.note_build()
 	return true

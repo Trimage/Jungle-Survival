@@ -29,6 +29,17 @@ signal day_advanced(day: int)
 @export var night_ambient_color: Color = Color(0.26, 0.33, 0.52)
 @export var night_ambient_energy: float = 0.45
 
+@export_group("하늘/안개")
+@export var day_sky_top: Color = Color(0.45, 0.7, 0.95)
+@export var day_sky_horizon: Color = Color(0.75, 0.85, 0.8)
+@export var night_sky_top: Color = Color(0.03, 0.05, 0.14)
+@export var night_sky_horizon: Color = Color(0.10, 0.13, 0.28)
+## 일출·일몰 노을(지평선이 잠깐 따뜻하게 물듦)
+@export var dusk_horizon: Color = Color(0.97, 0.52, 0.28)
+@export var day_fog: Color = Color(0.55, 0.68, 0.55)
+@export var night_fog: Color = Color(0.12, 0.16, 0.32)
+@export var dusk_fog: Color = Color(0.82, 0.46, 0.3)
+
 ## 밤으로 판정하는 태양 높이 임계값
 @export var night_threshold: float = 0.25
 
@@ -38,11 +49,14 @@ var day: int = 1
 var _is_night: bool = false
 @onready var _sun: DirectionalLight3D = $Sun
 @onready var _world_env: WorldEnvironment = $WorldEnvironment
+var _sky_mat: ProceduralSkyMaterial = null
 
 
 func _ready() -> void:
 	add_to_group("day_night")
 	time_of_day = start_time
+	if _world_env and _world_env.environment and _world_env.environment.sky:
+		_sky_mat = _world_env.environment.sky.sky_material as ProceduralSkyMaterial
 	_update_visuals(true)
 
 
@@ -70,11 +84,22 @@ func _update_visuals(force_signal: bool) -> void:
 	_sun.light_color = night_light_color.lerp(day_light_color, day_factor)
 	_sun.light_energy = lerpf(night_light_energy, day_light_energy, day_factor)
 
-	# 환경 앰비언트 보간
+	# 노을 강도: 태양이 지평선 근처(일출/일몰)일 때 최대
+	var dusk: float = clampf(1.0 - absf(sun_height) / 0.32, 0.0, 1.0)
+
+	# 환경 앰비언트 + 안개 보간
 	if _world_env and _world_env.environment:
 		var env: Environment = _world_env.environment
 		env.ambient_light_color = night_ambient_color.lerp(day_ambient_color, day_factor)
 		env.ambient_light_energy = lerpf(night_ambient_energy, day_ambient_energy, day_factor)
+		env.fog_light_color = night_fog.lerp(day_fog, day_factor).lerp(dusk_fog, dusk * 0.5)
+
+	# 하늘색 보간(낮↔밤) + 일출/일몰 지평선 노을
+	if _sky_mat:
+		var horizon: Color = night_sky_horizon.lerp(day_sky_horizon, day_factor).lerp(dusk_horizon, dusk * 0.7)
+		_sky_mat.sky_top_color = night_sky_top.lerp(day_sky_top, day_factor)
+		_sky_mat.sky_horizon_color = horizon
+		_sky_mat.ground_horizon_color = horizon
 
 	# 낮/밤 전환 판정
 	var now_night: bool = sun_height < night_threshold
