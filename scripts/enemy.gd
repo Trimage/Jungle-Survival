@@ -82,6 +82,7 @@ func _build_visual() -> void:
 	# model(.glb) 경로가 있으면 외부 모델, 없으면 기본 박스
 	var model_path: String = _def.get("model", "")
 	var built: Node3D = LowpolyFactory.build(sz, _base_color, model_path, false, _def.get("shape", "box"))
+	LowpolyFactory.outline_model(built)  # 카툰 외곽선(절차적 셰이프는 이미 있으면 건너뜀)
 	_mat = LowpolyFactory.last_material  # 본체 머티리얼(모델이면 null)
 	if model_path != "" and ResourceLoader.exists(model_path):
 		# 모델을 래퍼로 감싸 _face 회전과 분리(모델 정면 +Z, 추가 회전 불필요)

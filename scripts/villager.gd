@@ -126,6 +126,7 @@ func _build_visual() -> void:
 	if model_path != "" and ResourceLoader.exists(model_path):
 		# 외부 .glb 모델 사용(슬롯 크기에 자동 맞춤). _mat 없음 → 직업 색/플래시는 생략.
 		var vis: Node3D = LowpolyFactory.build(Vector3(0.8, 1.6, 0.8), WANDER_COLOR, model_path, false)
+		LowpolyFactory.outline_model(vis)  # 카툰 외곽선
 		_pivot.add_child(vis)  # 모델 정면이 +Z라 추가 회전 불필요
 		_mat = null
 		_anim = LowpolyFactory.find_anim_player(vis)

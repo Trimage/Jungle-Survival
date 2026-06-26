@@ -339,6 +339,33 @@ static func apply_outline(mat: StandardMaterial3D) -> void:
 		mat.next_pass = make_outline()
 
 
+## 불러온 모델(.glb)의 모든 메시 표면에 외곽선 패스를 입힌다.
+## 임포트된 공유 머티리얼을 건드리지 않도록 표면별 오버라이드를 복제해 적용.
+## (인버티드 헐 grow 는 정점 노멀 기준이라 스킨/애니메이션도 따라감)
+static func outline_model(root: Node, grow_amount: float = 0.03) -> void:
+	var outline := make_outline()
+	outline.grow_amount = grow_amount
+	_outline_recurse(root, outline)
+
+
+static func _outline_recurse(node: Node, outline: StandardMaterial3D) -> void:
+	if node is MeshInstance3D:
+		var mi := node as MeshInstance3D
+		if mi.mesh:
+			for i in mi.mesh.get_surface_count():
+				var src: Material = mi.get_active_material(i)
+				if src == null:
+					var fb := StandardMaterial3D.new()
+					fb.next_pass = outline
+					mi.set_surface_override_material(i, fb)
+				elif src.next_pass == null:
+					var dup: Material = src.duplicate()
+					dup.next_pass = outline
+					mi.set_surface_override_material(i, dup)
+	for ch in node.get_children():
+		_outline_recurse(ch, outline)
+
+
 ## 리깅된 .glb의 Idle 애니메이션을 찾아 루프 재생(T포즈 방지)
 static func _play_idle(root: Node) -> void:
 	var ap := _find_anim_player(root)

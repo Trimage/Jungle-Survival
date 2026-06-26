@@ -50,6 +50,7 @@ func _build_visual() -> void:
 	_base_color = Color.html(_def.get("color", "#888888")).lightened(0.2)
 	var model_path: String = _def.get("model", "")
 	var built: Node3D = LowpolyFactory.build(sz, _base_color, model_path, false, _def.get("shape", "creature"))
+	LowpolyFactory.outline_model(built)  # 카툰 외곽선
 	_mat = LowpolyFactory.last_material
 	if model_path != "" and ResourceLoader.exists(model_path):
 		# 모델을 래퍼로 감싸 _face 회전과 분리(모델 정면 +Z)

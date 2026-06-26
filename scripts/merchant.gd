@@ -15,6 +15,7 @@ func _build_visual() -> void:
 	var model := "res://assets/models/kaykit/Rogue_Hooded.glb"
 	if ResourceLoader.exists(model):
 		var vis: Node3D = LowpolyFactory.build(Vector3(0.85, 1.7, 0.85), Color.WHITE, model, false)
+		LowpolyFactory.outline_model(vis)  # 카툰 외곽선
 		add_child(vis)
 		add_child(LowpolyFactory.make_blob_shadow(0.45))
 	else:
